@@ -9,16 +9,27 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mui/material": "^5.8.5",
+    "@uauth/moralis": "^1.0.1",
+    "@walletconnect/web3-provider": "^1.7.8",
+    "@web3auth/web3auth": "^1.0.1",
+    "magic-sdk": "^8.1.1",
+    "moralis": "^1.8.0",
     "next": "12.1.6",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.4.0",
+    "web3.storage": "^4.3.0"
   },
   "devDependencies": {
     "@types/node": "17.0.45",
     "@types/react": "16.14.28",
     "@types/react-dom": "18.0.5",
+    "autoprefixer": "^10.4.7",
     "eslint": "8.18.0",
     "eslint-config-next": "12.1.6",
+    "postcss": "^8.4.14",
+    "tailwindcss": "^3.1.4",
     "typescript": "4.7.4"
   }
 }
