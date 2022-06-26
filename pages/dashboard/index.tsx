@@ -35,7 +35,7 @@ import {
 
         const client = await makeStorageClient();
 
-        return client.put(files, { onRootCidReady, onStoredChunk });
+        // return client.put(files, { onRootCidReady, onStoredChunk });
       }; 
 
 const Dashboard = () => {
@@ -73,15 +73,15 @@ const Dashboard = () => {
         event.preventDefault();
      const fileList = event.dataTransfer.files;
         //  sendStuff(fileList)
-    }} className="w-full flex items-start justify-between flex-wrap filedrop h-screen">
+    }} className="w-full flex items-start justify-between filedrop h-screen">
     <div className="h-full min-w-[350px] w-[350px]">
-
+        hereh
     </div>
     <div className="w-full h-full">
-
+        there
     </div>
     <div className="h-full min-w-[250px] w-[250px]">
-
+        too
     </div>
     </div>)
 }
