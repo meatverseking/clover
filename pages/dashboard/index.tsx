@@ -40,27 +40,27 @@ import {
 
 const Dashboard = () => {
 
-    const sendStuff = (files:FileList) => {
+//     const sendStuff = (files:FileList) => {
         
-        const blobFiles = [];
+//         const blobFiles = [];
         
-        for(let i:number = 0;i<files.length; i++) {
+//         for(let i:number = 0;i<files.length; i++) {
 
-        let startPointer = 0;
-        let endPointer = files[i].size;
-        let chunks = [];
-        while(startPointer<endPointer){
-            let newStartPointer = startPointer+(files[i].size/2);
-            chunks.push(files[i].slice(startPointer,newStartPointer));
-            startPointer = newStartPointer;
-        }
+//         let startPointer = 0;
+//         let endPointer = files[i].size;
+//         let chunks = [];
+//         while(startPointer<endPointer){
+//             let newStartPointer = startPointer+(files[i].size/2);
+//             chunks.push(files[i].slice(startPointer,newStartPointer));
+//             startPointer = newStartPointer;
+//         }
 
-         blobFiles.push(new Blob(chunks, { type: files[i].type }));              
-    }
+//          blobFiles.push(new Blob(chunks, { type: files[i].type }));              
+//     }
 
 
 
-}
+// }
 
     return (
     
@@ -72,11 +72,17 @@ const Dashboard = () => {
          event.stopPropagation();
         event.preventDefault();
      const fileList = event.dataTransfer.files;
-         sendStuff(fileList)
-    }} className="w-full filedrop h-screen">
+        //  sendStuff(fileList)
+    }} className="w-full flex items-start justify-between flex-wrap filedrop h-screen">
+    <div className="h-full min-w-[350px] w-[350px]">
 
+    </div>
+    <div className="w-full h-full">
 
+    </div>
+    <div className="h-full min-w-[250px] w-[250px]">
 
+    </div>
     </div>)
 }
 
