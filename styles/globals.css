@@ -18,6 +18,27 @@ a {
   text-decoration: none;
 }
 
+body::-webkit-scrollbar,
+.cusscroller::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body::-webkit-scrollbar-track,
+.cusscroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body::-webkit-scrollbar-thumb,
+.cusscroller::-webkit-scrollbar-thumb {
+  background-color: rgb(219, 219, 219);
+  border-radius: 20px;
+}
+
+.sidebar .css-5xe99f-MuiLinearProgress-bar1{
+  background-color:#40A9FF !important;
+}
+
 * {
   box-sizing: border-box;
 }

@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
     "@mui/material": "^5.8.5",
     "@uauth/moralis": "^1.0.1",
     "@walletconnect/web3-provider": "^1.7.8",
@@ -19,8 +21,8 @@
     "react": "18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.4.0",
-    "web3.storage": "^4.3.0",
-    "react-moralis": "^1.4.0"
+    "react-moralis": "^1.4.0",
+    "web3.storage": "^4.3.0"
   },
   "devDependencies": {
     "@types/node": "17.0.45",
