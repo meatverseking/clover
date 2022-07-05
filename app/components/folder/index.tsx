@@ -1,3 +1,5 @@
+import { getSize } from "../extras/folder";
+
 const Folder = ({ color = "#40A9FF", data }: { color?: string, data: {
   name: string,
   files: number,
@@ -6,25 +8,8 @@ const Folder = ({ color = "#40A9FF", data }: { color?: string, data: {
 
   const { name, files, size} = data;
 
-  const getSize = () => {
-
-    const format = (_size: number, subsize:number, type: string): string => {
-        return (_size / subsize).toFixed(2) + type;
-    }
-
-    if(size > 1048576)
-        return format(size, 1048576, 'TB');
-    else if (size > 1024) 
-          return format(size, 1024, "GB");
-    else if(size > 1)
-          return format(size, 1, 'MB');
-    else if(size > 0.000977)
-          return format(size, 0.000977, 'KB');
-    else if (size > 0.000000977) 
-          return format(size, 0.000000977, 'B');
-  }
-
-  const mainSize = getSize();
+  
+  const mainSize = getSize(size);
 
   return (
     <div className="flex m-auto flex-col w-[186px] h-[199px] py-4 px-2 justify-between items-center cursor-pointer border-[1px] border-solid border-transparent hover:bg-[#8b8b8b24] hover:border-[#e1e1e1] transition-all delay-300">

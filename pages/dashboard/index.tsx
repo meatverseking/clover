@@ -5,12 +5,21 @@ import {
   Button,Paper, InputBase, IconButton
 } from "@mui/material"
 
+import {
+  AiOutlineFilePdf,
+  AiOutlineFileUnknown,
+  AiOutlineFileImage,
+} from "react-icons/ai";
+import user from '../../public/images/user.png';
+import Image from 'next/image'
+
 import Head from 'next/head';
 
 import { FaRegFolderOpen, FaPlus, FaFolder, FaTrash, FaRegClock } from 'react-icons/fa'
-import { BsCloudy, BsGrid3X3Gap } from 'react-icons/bs'
+import { BsCloudy, BsGrid3X3Gap, BsList } from "react-icons/bs";
 import { TbSearch, TbUsers } from 'react-icons/tb'
 import Folder from "../../app/components/folder";
+import Pinned from "../../app/components/pinned";
 
 
 // const makeStorageClient = async () => {
@@ -84,7 +93,7 @@ const Dashboard = () => {
             <Link href="/">
               <div className="text-[#1890FF] flex pl-4 items-center font-bold text-[18px]">
                 <FaFolder size={25} className="mr-5 flex" color={"#1890FF"} />
-                Clear Cloud
+                ClearCloud
               </div>
             </Link>
           </div>
@@ -230,7 +239,11 @@ const Dashboard = () => {
                   </IconButton>
                 </Paper>
                 <div className="cursor-pointer">
-                  <BsGrid3X3Gap size={19} color="#00000073" />
+                  {false ? (
+                    <BsList size={19} color="#00000073" />
+                  ) : (
+                    <BsGrid3X3Gap size={19} color="#00000073" />
+                  )}
                 </div>
               </div>
 
@@ -259,7 +272,104 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="h-full min-w-[250px] w-[250px]">too</div>
+        <div className="h-full px-[16px] py-[31px] min-w-[354px] w-[354px]">
+          <div className="flex mb-6 items-center">
+            <div className="mr-3">
+              <Image src={user} width={64} height={64} alt="user" />
+            </div>
+
+            <div>
+              <h3 className="text-[20px] mb-1 leading-7 text-[#000000D9] font-[500]">
+                Hi, There
+              </h3>
+
+              <Link href="/settings">
+                <a className="text-[#00000073] text-[14px] leading-[22px] font-[400]">
+                  Profile Settings
+                </a>
+              </Link>
+            </div>
+          </div>
+
+          <div className="mb-[23px]">
+            <span className="text-[14px] block mb-4 font-[500] leading-5 text-[#595959]">
+              Type File
+            </span>
+
+            <div className="flex justify-between mb-[18px] items-center">
+              <div className="flex items-center">
+                <AiOutlineFileImage
+                  size={14}
+                  className="mr-[11px]"
+                  color={"#00000073"}
+                />
+
+                <span className="text-[14px] text-[#00000073] font-[400] leading-5">
+                  Photo & Video
+                </span>
+              </div>
+              <Link href="/">
+                <a className="text-[14px] cursor-pointer text-[#00000073] font-[400]">
+                  See all
+                </a>
+              </Link>
+            </div>
+
+            <div className="flex justify-between mb-[18px] items-center">
+              <div className="flex items-center">
+                <AiOutlineFilePdf
+                  size={14}
+                  className="mr-[11px]"
+                  color={"#00000073"}
+                />
+
+                <span className="text-[14px] text-[#00000073] font-[400] leading-5">
+                  Documents
+                </span>
+              </div>
+              <Link href="/">
+                <a className="text-[14px] cursor-pointer text-[#00000073] font-[400]">
+                  See all
+                </a>
+              </Link>
+            </div>
+
+            <div className="flex justify-between mb-[18px] items-center">
+              <div className="flex items-center">
+                <AiOutlineFileUnknown
+                  size={14}
+                  className="mr-[11px]"
+                  color={"#00000073"}
+                />
+
+                <span className="text-[14px] text-[#00000073] font-[400] leading-5">
+                  Others
+                </span>
+              </div>
+              <Link href="/">
+                <a className="text-[14px] cursor-pointer text-[#00000073] font-[400]">
+                  See all
+                </a>
+              </Link>
+            </div>
+          </div>
+
+          <div className="mb-[23px]">
+            <span className="text-[14px] block mb-4 font-[500] leading-5 text-[#595959]">
+              Pinned
+            </span>
+
+            <Pinned data={{
+                name: "Office Work",
+                items: 10,
+                size: 23
+            }}/>
+
+            
+
+            
+          </div>
+        </div>
       </div>
     </>
   );
