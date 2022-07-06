@@ -89,7 +89,7 @@ const Dashboard = () => {
       }, 500);
   }
 
-  const sidebar = (color?: undefined | string) => (side3 ? <MdMenuOpen color={color} size={30} /> : <MdMenu color={color} size={30} />);
+  const sidebar = (color?: string) => (side3 ? <MdMenuOpen color={color} size={30} /> : <MdMenu color={color} size={30} />);
 
   return (
     <>

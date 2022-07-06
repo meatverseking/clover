@@ -14,7 +14,7 @@ body {
 @media screen and (max-width: 427px){
   .flist{
       grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)) !important;
-}
+  }
 }
 
 body *:not(i, svg){
