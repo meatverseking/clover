@@ -13,7 +13,10 @@ module.exports = {
     "./pages/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    screens: {},
+    screens: {
+      "st": { max: "750px" },
+      "md": { max: "427px" },
+    },
     extend: {},
   },
   plugins: [],

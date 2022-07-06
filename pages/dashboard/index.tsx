@@ -12,7 +12,7 @@ import Image from 'next/image'
 
 import { FaRegFolderOpen, FaPlus, FaFolder, FaTrash, FaRegClock } from 'react-icons/fa';
 import { MdMenuOpen, MdMenu } from "react-icons/md";
-import { BsCloudUpload, BsCloudy, BsGrid3X3Gap, BsList, BsPeople, BsPinAngle } from "react-icons/bs";
+import { BsCloudUpload, BsCloudy, BsFillCloudUploadFill, BsGrid3X3Gap, BsList, BsPeople, BsPinAngle } from "react-icons/bs";
 import { TbSearch } from 'react-icons/tb';
 import Dash from "../../app/components/dash";
 import Folder from "../../app/components/folder";
@@ -89,7 +89,7 @@ const Dashboard = () => {
       }, 500);
   }
 
-  const sidebar = side3 ? <MdMenuOpen size={30} /> : <MdMenu size={30} />;
+  const sidebar = (color?: undefined | string) => (side3 ? <MdMenuOpen color={color} size={30} /> : <MdMenu color={color} size={30} />);
 
   return (
     <>
@@ -108,20 +108,27 @@ const Dashboard = () => {
         }}
         className="w-full flex items-start justify-between filedrop min-h-screen"
       >
+        <button className="py-2 mr-4 hidden st:flex fixed right-0 bottom-[10px] justify-center z-[90] items-center px-4 bg-[#1890FF] text-white w-[60px] h-[60px] rounded-[50%] overflow-hidden transition-all delay-500 hover:bg-[#0c75d6] font-[300]">
+          <BsFillCloudUploadFill size={30} />
+        </button>
         <div
           style={{
             width: side ? 236 : 0,
             minWidth: side ? 236 : 0,
           }}
-          className="h-full bg-[#f5F5F5] overflow-hidden border-r border-r-[#F0F0F0] sidebar fixed transition-all delay-500"
+          className="h-full bg-[#f5F5F5] overflow-hidden border-r border-r-[#F0F0F0] sidebar st:z-[200] st:absolute fixed transition-all delay-500"
         >
-          <div className="mt-[2.3rem] mb-[1.24rem] ">
+          <div className="mt-[2.3rem] st:flex st:justify-between st:items-center mb-[1.24rem] ">
             <Link href="/">
               <a className="text-[#1890FF] cursor-pointer flex pl-4 items-center font-bold text-[18px]">
                 <FaFolder size={25} className="mr-2 flex" color={"#1890FF"} />
                 ClearCloud
               </a>
             </Link>
+
+            <div onClick={() => mside()} className="mr-2 cursor-pointer">
+              {sidebar("#1890ff")}
+            </div>
           </div>
 
           <div className="flex flex-col h-full">
@@ -232,23 +239,20 @@ const Dashboard = () => {
           style={{
             paddingLeft: side ? 236 : 0,
           }}
-          className="w-full transition-all delay-500 h-full flex flex-col"
+          className="w-full st:!pl-0 transition-all delay-500 h-full flex flex-col"
         >
           <div className="px-5 h-full">
             <div className="flex justify-between items-center py-4">
               <div className="flex items-center">
-                <div
-                  onClick={() => mside()}
-                  className="mr-2 cursor-pointer"
-                >
-                  {sidebar}
+                <div onClick={() => mside()} className="mr-2 cursor-pointer">
+                  {sidebar()}
                 </div>
                 <div className="font-semibold text-[20px] text-black">
                   My Drive
                 </div>
               </div>
               <div className="flex items-center">
-                <button className="py-2 mr-4 flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[120px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]">
+                <button className="py-2 mr-4 st:!hidden flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[120px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]">
                   <BsCloudUpload size={20} className="min-w-[20px]" />{" "}
                   <span className="mr-4">Upload</span>
                 </button>
@@ -256,9 +260,9 @@ const Dashboard = () => {
                 <div
                   aria-describedby={id}
                   onClick={handleClick}
-                  className="mr-3 border-[2px] overflow-hidden border-solid border-[#1890FF] h-[67px] w-[67px] cursor-pointer rounded-[50%]"
+                  className="border-[2px] overflow-hidden border-solid border-[#1890FF] h-[50px] w-[50px] cursor-pointer rounded-[50%]"
                 >
-                  <Image src={user} width={64} height={64} alt="user" />
+                  <Image src={user} width={47} height={47} alt="user" />
                 </div>
 
                 <Popper id={id} open={open} anchorEl={anchorEl} transition>
@@ -335,7 +339,7 @@ const Dashboard = () => {
                 style={{
                   gridTemplateColumns: "repeat(auto-fill, minmax(186px, 1fr))",
                 }}
-                className="pt-7 grid gap-2 grid-flow-dense"
+                className="flist pt-7 grid gap-2 grid-flow-dense"
               >
                 <Folder
                   data={{

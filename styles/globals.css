@@ -7,8 +7,14 @@ html,
 body {
   padding: 0;
   margin: 0;
-  min-width:100%;
+  min-width:340px;
   min-height:100%;
+}
+
+@media screen and (max-width: 427px){
+  .flist{
+      grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)) !important;
+}
 }
 
 body *:not(i, svg){
