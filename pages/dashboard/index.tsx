@@ -10,7 +10,8 @@ import {
 import user from '../../public/images/user.png';
 import Image from 'next/image'
 
-import { FaRegFolderOpen, FaPlus, FaFolder, FaTrash, FaRegClock } from 'react-icons/fa'
+import { FaRegFolderOpen, FaPlus, FaFolder, FaTrash, FaRegClock } from 'react-icons/fa';
+import { MdMenuOpen, MdMenu } from "react-icons/md";
 import { BsCloudUpload, BsCloudy, BsGrid3X3Gap, BsList, BsPeople, BsPinAngle } from "react-icons/bs";
 import { TbSearch } from 'react-icons/tb';
 import Dash from "../../app/components/dash";
@@ -63,6 +64,8 @@ const Dashboard = () => {
 
   // }
 
+
+
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -75,6 +78,18 @@ const Dashboard = () => {
   const id = canBeOpen ? "transition-popper" : undefined;
 
   const [side, uside] = useState<boolean>(true);
+
+  const [side3, uside3] = useState<boolean>(true);
+
+  const mside = () => {
+      uside(!side);
+
+      setTimeout(() => {
+           uside3(!side3);
+      }, 500);
+  }
+
+  const sidebar = side3 ? <MdMenuOpen size={30} /> : <MdMenu size={30} />;
 
   return (
     <>
@@ -93,10 +108,13 @@ const Dashboard = () => {
         }}
         className="w-full flex items-start justify-between filedrop min-h-screen"
       >
-        <div style={{
-          width: side ? 236 : 0,
-          minWidth: side ? 236 : 0
-        }} className="h-full bg-[#f5F5F5] overflow-hidden border-r border-r-[#F0F0F0] sidebar fixed transition-all delay-500">
+        <div
+          style={{
+            width: side ? 236 : 0,
+            minWidth: side ? 236 : 0,
+          }}
+          className="h-full bg-[#f5F5F5] overflow-hidden border-r border-r-[#F0F0F0] sidebar fixed transition-all delay-500"
+        >
           <div className="mt-[2.3rem] mb-[1.24rem] ">
             <Link href="/">
               <a className="text-[#1890FF] cursor-pointer flex pl-4 items-center font-bold text-[18px]">
@@ -210,13 +228,24 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div style={{
-          paddingLeft: side ? 236 : 0
-        }} className="w-full transition-all delay-500 h-full flex flex-col">
+        <div
+          style={{
+            paddingLeft: side ? 236 : 0,
+          }}
+          className="w-full transition-all delay-500 h-full flex flex-col"
+        >
           <div className="px-5 h-full">
             <div className="flex justify-between items-center py-4">
-              <div className="font-semibold text-[20px] text-black">
-                My Drive
+              <div className="flex items-center">
+                <div
+                  onClick={() => mside()}
+                  className="mr-2 cursor-pointer"
+                >
+                  {sidebar}
+                </div>
+                <div className="font-semibold text-[20px] text-black">
+                  My Drive
+                </div>
               </div>
               <div className="flex items-center">
                 <button className="py-2 mr-4 flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[120px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]">
