@@ -15,7 +15,7 @@ const Pinned = ({
   const mainSize = getSize(size)
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex justify-between items-center cursor-pointer hover:bg-[#8b8b8b24] border-solid border-[1px] rounded-[4px] border-[#F5F5F5] p-3 mb-3 transition-all delay-300">
       <svg
         width="43"
         height="32"
@@ -33,7 +33,9 @@ const Pinned = ({
       </svg>
 
       <div className="w-full">
-        <h2 className="font-[500] text-[#000000D9] leading-7 text-[20px] truncate w-full">{name}</h2>
+        <h2 className="font-[500] text-[#000000D9] leading-7 text-[20px] truncate w-full">
+          {name}
+        </h2>
         <div className="flex items-center justify-between">
           <span className="text-[#00000073] leading-6 text-[16px] font-[700]">
             {items} item{items > 1 ? "s" : ""}

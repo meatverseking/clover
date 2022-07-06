@@ -1,27 +1,21 @@
 import { Web3Storage } from "web3.storage";
 import Link from 'next/link';
+import { RiLogoutCircleLine, RiSettingsLine } from 'react-icons/ri';
+import { useState } from "react"; 
 import {
   LinearProgress,
-  Button,Paper, InputBase, IconButton
+  Button,Paper, InputBase, IconButton, Popper, Box, Fade, 
 } from "@mui/material"
 
-import {
-  AiOutlineFilePdf,
-  AiOutlineFileUnknown,
-  AiOutlineFileImage,
-} from "react-icons/ai";
 import user from '../../public/images/user.png';
 import Image from 'next/image'
 
-import Head from 'next/head';
-
 import { FaRegFolderOpen, FaPlus, FaFolder, FaTrash, FaRegClock } from 'react-icons/fa'
-import { BsCloudy, BsGrid3X3Gap, BsList } from "react-icons/bs";
-import { TbSearch, TbUsers } from 'react-icons/tb'
+import { BsCloudUpload, BsCloudy, BsGrid3X3Gap, BsList, BsPeople, BsPinAngle } from "react-icons/bs";
+import { TbSearch } from 'react-icons/tb';
+import Dash from "../../app/components/dash";
 import Folder from "../../app/components/folder";
-import Pinned from "../../app/components/pinned";
-
-
+ 
 // const makeStorageClient = async () => {
 //   // return new Web3Storage({
 //   //   token: ''
@@ -69,11 +63,22 @@ const Dashboard = () => {
 
   // }
 
+  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    setOpen((previousOpen) => !previousOpen);
+  };
+
+  const canBeOpen = open && Boolean(anchorEl);
+  const id = canBeOpen ? "transition-popper" : undefined;
+
+  const [side, uside] = useState<boolean>(true);
+
   return (
     <>
-      <Head>
-        <title>user | Dashboard</title>
-      </Head>
+      <Dash />
       <div
         onDragOver={(event) => {
           event.stopPropagation();
@@ -88,13 +93,16 @@ const Dashboard = () => {
         }}
         className="w-full flex items-start justify-between filedrop min-h-screen"
       >
-        <div className="h-full bg-[#f5F5F5] sidebar fixed min-w-[236px] w-[236px]">
-          <div className="mt-3 mb-5">
+        <div style={{
+          width: side ? 236 : 0,
+          minWidth: side ? 236 : 0
+        }} className="h-full bg-[#f5F5F5] overflow-hidden border-r border-r-[#F0F0F0] sidebar fixed transition-all delay-500">
+          <div className="mt-[2.3rem] mb-[1.24rem] ">
             <Link href="/">
-              <div className="text-[#1890FF] flex pl-4 items-center font-bold text-[18px]">
-                <FaFolder size={25} className="mr-5 flex" color={"#1890FF"} />
+              <a className="text-[#1890FF] cursor-pointer flex pl-4 items-center font-bold text-[18px]">
+                <FaFolder size={25} className="mr-2 flex" color={"#1890FF"} />
                 ClearCloud
-              </div>
+              </a>
             </Link>
           </div>
 
@@ -110,7 +118,11 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
-                  <TbUsers className="mr-2" size={20} /> Shared with me
+                  <BsPeople className="mr-2" size={20} /> Shared with me
+                </div>
+
+                <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
+                  <BsPinAngle className="mr-2" size={20} /> Pinned
                 </div>
               </div>
 
@@ -185,29 +197,72 @@ const Dashboard = () => {
 
               <div className="px-4 pb-10 mt-4 flex justify-center">
                 <Button
+                  style={{
+                    fontFamily: "inherit",
+                  }}
                   className="text-[14px] text-[#000] w-full hover:text-white hover:bg-[rgba(0,0,0,0.3)]  capitalize"
                   variant="contained"
                 >
-                  Upgrade Storage Size
+                  Upgrade Storage
                 </Button>
               </div>
             </div>
           </div>
         </div>
-        <div className="w-full pl-[236px] h-full flex flex-col">
-          <div className="px-5 border-l border-r h-full">
-            <div className="flex justify-between py-4">
-              <div className="font-semibold text-[28px] text-black">
+
+        <div style={{
+          paddingLeft: side ? 236 : 0
+        }} className="w-full transition-all delay-500 h-full flex flex-col">
+          <div className="px-5 h-full">
+            <div className="flex justify-between items-center py-4">
+              <div className="font-semibold text-[20px] text-black">
                 My Drive
               </div>
-              <div className="">
-                <button className="py-2 flex items-center px-8 bg-[#1890FF] text-white rounded-md text-[16px] transition-all delay-300 hover:bg-[#0c75d6] font-[300]">
-                  <FaPlus size={12} className="mr-2" /> Upload
+              <div className="flex items-center">
+                <button className="py-2 mr-4 flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[120px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]">
+                  <BsCloudUpload size={20} className="min-w-[20px]" />{" "}
+                  <span className="mr-4">Upload</span>
                 </button>
+
+                <div
+                  aria-describedby={id}
+                  onClick={handleClick}
+                  className="mr-3 border-[2px] overflow-hidden border-solid border-[#1890FF] h-[67px] w-[67px] cursor-pointer rounded-[50%]"
+                >
+                  <Image src={user} width={64} height={64} alt="user" />
+                </div>
+
+                <Popper id={id} open={open} anchorEl={anchorEl} transition>
+                  {({ TransitionProps }) => (
+                    <Fade {...TransitionProps} timeout={350}>
+                      <Box
+                        sx={{
+                          minWidth: 200,
+                          p: 1,
+                          borderRadius: "4px",
+                          border: "1px solid #ededed",
+                          bgcolor: "background.paper",
+                        }}
+                      >
+                        <Link href="dashboard/settings">
+                          <a className="flex pl-4 text-[14px] items-center text-[rgba(0,0,0,0.45)] hover:bg-[#6262621f] py-2 cursor-pointer transition-all delay-500 mb-1 rounded-[3px]">
+                            <RiSettingsLine className="mr-2" size={20} />{" "}
+                            Settings
+                          </a>
+                        </Link>
+
+                        <div className="flex pl-4 rounded-[3px] text-[14px] items-center text-[rgba(0,0,0,0.45)] hover:bg-[#6262621f] py-2 cursor-pointer transition-all delay-500">
+                          <RiLogoutCircleLine className="mr-2" size={20} /> Log
+                          Out
+                        </div>
+                      </Box>
+                    </Fade>
+                  )}
+                </Popper>
               </div>
             </div>
             <div className="px-1">
-              <div className="flex items-center justify-between pt-7">
+              <div className="flex items-center justify-between pt-3">
                 <Paper
                   component="form"
                   sx={{
@@ -270,104 +325,6 @@ const Dashboard = () => {
                 />
               </div>
             </div>
-          </div>
-        </div>
-        <div className="h-full px-[16px] py-[31px] min-w-[354px] w-[354px]">
-          <div className="flex mb-6 items-center">
-            <div className="mr-3">
-              <Image src={user} width={64} height={64} alt="user" />
-            </div>
-
-            <div>
-              <h3 className="text-[20px] mb-1 leading-7 text-[#000000D9] font-[500]">
-                Hi, There
-              </h3>
-
-              <Link href="/settings">
-                <a className="text-[#00000073] text-[14px] leading-[22px] font-[400]">
-                  Profile Settings
-                </a>
-              </Link>
-            </div>
-          </div>
-
-          <div className="mb-[23px]">
-            <span className="text-[14px] block mb-4 font-[500] leading-5 text-[#595959]">
-              Type File
-            </span>
-
-            <div className="flex justify-between mb-[18px] items-center">
-              <div className="flex items-center">
-                <AiOutlineFileImage
-                  size={14}
-                  className="mr-[11px]"
-                  color={"#00000073"}
-                />
-
-                <span className="text-[14px] text-[#00000073] font-[400] leading-5">
-                  Photo & Video
-                </span>
-              </div>
-              <Link href="/">
-                <a className="text-[14px] cursor-pointer text-[#00000073] font-[400]">
-                  See all
-                </a>
-              </Link>
-            </div>
-
-            <div className="flex justify-between mb-[18px] items-center">
-              <div className="flex items-center">
-                <AiOutlineFilePdf
-                  size={14}
-                  className="mr-[11px]"
-                  color={"#00000073"}
-                />
-
-                <span className="text-[14px] text-[#00000073] font-[400] leading-5">
-                  Documents
-                </span>
-              </div>
-              <Link href="/">
-                <a className="text-[14px] cursor-pointer text-[#00000073] font-[400]">
-                  See all
-                </a>
-              </Link>
-            </div>
-
-            <div className="flex justify-between mb-[18px] items-center">
-              <div className="flex items-center">
-                <AiOutlineFileUnknown
-                  size={14}
-                  className="mr-[11px]"
-                  color={"#00000073"}
-                />
-
-                <span className="text-[14px] text-[#00000073] font-[400] leading-5">
-                  Others
-                </span>
-              </div>
-              <Link href="/">
-                <a className="text-[14px] cursor-pointer text-[#00000073] font-[400]">
-                  See all
-                </a>
-              </Link>
-            </div>
-          </div>
-
-          <div className="mb-[23px]">
-            <span className="text-[14px] block mb-4 font-[500] leading-5 text-[#595959]">
-              Pinned
-            </span>
-
-            <Pinned data={{
-                name: "Office Work",
-                items: 10,
-                size: 23
-            }}/>
-
-            
-
-            
           </div>
         </div>
       </div>
