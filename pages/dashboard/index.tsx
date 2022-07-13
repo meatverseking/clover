@@ -1,4 +1,3 @@
-import { Web3Storage } from "web3.storage";
 import Link from 'next/link';
 import { RiLogoutCircleLine, RiSettingsLine } from 'react-icons/ri';
 import { useState } from "react"; 
@@ -16,54 +15,104 @@ import { BsCloudUpload, BsCloudy, BsFillCloudUploadFill, BsGrid3X3Gap, BsList, B
 import { TbSearch } from 'react-icons/tb';
 import Dash from "../../app/components/dash";
 import Folder from "../../app/components/folder";
- 
-// const makeStorageClient = async () => {
-//   // return new Web3Storage({
-//   //   token: ''
-//   // });
-// };
 
-// const beginUpload = async (files: FileList) => {
-//   const { size: totalSize } = files[0];
+import { useMoralis } from "react-moralis";
+import { useContext } from "react";
+import { GenContext } from "../../app/components/extras/contexts/genContext";
+import { makeStorageClient } from "../../app/components/extras/storage/utoken"
 
-//   const onRootCidReady = (cid: string) => { };
-
-//   let uploaded = 0;
-
-//   const onStoredChunk = (size: number) => {
-//     uploaded += size;
-
-//     const pct = (totalSize / uploaded) * 100;
-
-//     console.log(`Uploading... ${pct.toFixed(2)}% complete`);
-//   };
-
-//   const client = await makeStorageClient();
-
-//   // return client.put(files, { onRootCidReady, onStoredChunk });
-// };
 
 const Dashboard = () => {
-  //     const sendStuff = (files:FileList) => {
+  
+    const { Moralis } = useMoralis();
 
-  //         const blobFiles = [];
+    /* upload */
+    const uploadData = useContext(GenContext);
 
-  //         for(let i:number = 0;i<files.length; i++) {
+    const { upload } = uploadData;
 
-  //         let startPointer = 0;
-  //         let endPointer = files[i].size;
-  //         let chunks = [];
-  //         while(startPointer<endPointer){
-  //             let newStartPointer = startPointer+(files[i].size/2);
-  //             chunks.push(files[i].slice(startPointer,newStartPointer));
-  //             startPointer = newStartPointer;
-  //         }
+    const { success, error, loading } = upload;
 
-  //          blobFiles.push(new Blob(chunks, { type: files[i].type }));
-  //     }
+    const triggerUpload = (w: any) => {
+      uploadFiles(w.files);
+    };
 
-  // }
+    const uploadFiles = (files: FileList) => {
+      let maxSize: number = 0;
+      const blobFiles: File[] = [];
 
+      for (let i: number = 0; i < files.length; i++) {
+        let startPointer: number = 0;
+        let endPointer: number = files[i].size;
+        maxSize += files[i].size;
+        let chunks: any[] = [files[i].name, files[i].type, []];
+        while (startPointer < endPointer) {
+          let newStartPointer: number = startPointer + files[i].size;
+          chunks[2].push(files[i].slice(startPointer, newStartPointer));
+          startPointer = newStartPointer;
+        }
+
+        blobFiles.push(
+          new File(
+            [new Blob(chunks[2], { type: files[i].type })],
+            files[i].name,
+            {}
+          )
+        );
+      }
+
+      uploadProvider(blobFiles, maxSize);
+    };
+
+    const dropHere = (event: React.DragEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+      event.preventDefault();
+      const fileList = event.dataTransfer.files;
+      uploadFiles(fileList);
+    };
+
+    const dragHere = (event: React.DragEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "copy";
+    };
+
+
+    const fileData = [];
+
+
+    const uploadProvider = async (files: File[], totalSize: number) => {
+      const onRootCidReady = (cid: string) => {
+        error?.update("");
+        success?.update(true);
+
+        console.log(cid, files[0]);
+       
+
+      };
+
+      let uploaded = 0;
+
+      const onStoredChunk = (size: number) => {
+        uploaded += size;
+
+        const pct: number = (uploaded / totalSize) * 100;
+
+        console.log(`Uploading... ${pct.toFixed(2)}% complete`);
+
+        loading?.update(pct);
+      };
+
+
+      const client = makeStorageClient(await Moralis.Cloud.run("getWeb3StorageKey"));
+
+      files.forEach((file, i) => {
+          
+          return client.put([file], { onRootCidReady, onStoredChunk });
+      })
+    }; 
+
+    /*end of upload*/
 
 
   const [open, setOpen] = useState(false);
@@ -96,15 +145,10 @@ const Dashboard = () => {
       <Dash />
       <div
         onDragOver={(event) => {
-          event.stopPropagation();
-          event.preventDefault();
-          event.dataTransfer.dropEffect = "copy";
+          dragHere(event);
         }}
         onDrop={(event) => {
-          event.stopPropagation();
-          event.preventDefault();
-          const fileList = event.dataTransfer.files;
-          //  sendStuff(fileList)
+          dropHere(event);
         }}
         className="w-full flex items-start justify-between filedrop min-h-screen"
       >
@@ -116,9 +160,9 @@ const Dashboard = () => {
             width: side ? 236 : 0,
             minWidth: side ? 236 : 0,
           }}
-          className="h-full bg-[#f5F5F5] overflow-hidden border-r border-r-[#F0F0F0] sidebar st:z-[200] st:absolute fixed transition-all delay-500"
+          className="h-full bg-[#f5F5F5] overflow-hidden border-l border-l-[#F0F0F0] sidebar st:z-[200] st:absolute fixed transition-all delay-500"
         >
-          <div className="mt-[2.3rem] st:flex st:justify-between st:items-center mb-[1.24rem] ">
+          <div className="mt-[1.6rem] st:flex st:justify-between st:items-center mb-[1.24rem]">
             <Link href="/">
               <a className="text-[#1890FF] cursor-pointer flex pl-4 items-center font-bold text-[18px]">
                 <FaFolder size={25} className="mr-2 flex" color={"#1890FF"} />
@@ -126,71 +170,71 @@ const Dashboard = () => {
               </a>
             </Link>
 
-            <div onClick={() => mside()} className="mr-2 cursor-pointer">
+            <div onClick={() => mside()} className="mr-2 hidden st:block cursor-pointer">
               {sidebar("#1890ff")}
             </div>
           </div>
 
           <div className="flex flex-col h-full">
-            <div className="cusscroller h-[calc(100% - 1.25rem - 0.75rem - 27px)] overflow-y-scroll overflow-x-hidden">
+            <div className="cusscroller h-[calc(100%-1.25rem-0.75rem-27px)] overflow-y-scroll overflow-x-hidden">
               <div className="mb-2">
                 <span className="pl-4 font-[500] mb-3 block text-[#595959]">
                   Drive Storage
                 </span>
 
-                <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
+                <div className="flex pl-4 text-[14px] border-l-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-l-[#5F5F5F] border-l-solid border-l-2 ">
                   <FaRegFolderOpen className="mr-2" size={20} /> My Drive
                 </div>
 
-                <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
+                <div className="flex pl-4 text-[14px] border-l-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-l-[#5F5F5F] border-l-solid border-l-2 ">
                   <BsPeople className="mr-2" size={20} /> Shared with me
                 </div>
 
-                <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
+                <div className="flex pl-4 text-[14px] border-l-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-l-[#5F5F5F] border-l-solid border-l-2 ">
                   <BsPinAngle className="mr-2" size={20} /> Pinned
                 </div>
               </div>
 
-              <div className="mb-2">
+              {/* <div className="mb-2">
                 <span className="pl-4 font-[500] text-[14px] mb-3 block text-[#595959]">
                   Tags
                 </span>
 
-                <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
+                <div className="flex pl-4 text-[14px] border-l-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-l-[#5F5F5F] border-l-solid border-l-2 ">
                   <div className="h-[14px] w-[14px] mr-2 rounded-[50%] bg-[#FF4D4F]"></div>{" "}
                   Red
                 </div>
 
-                <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
+                <div className="flex pl-4 text-[14px] border-l-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-l-[#5F5F5F] border-l-solid border-l-2 ">
                   <div className="h-[14px] w-[14px] mr-2 rounded-[50%] bg-[#FADB14]"></div>{" "}
                   Yellow
                 </div>
 
-                <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
+                <div className="flex pl-4 text-[14px] border-l-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-l-[#5F5F5F] border-l-solid border-l-2 ">
                   <div className="h-[14px] w-[14px] mr-2 rounded-[50%] bg-[#40A9FF]"></div>{" "}
                   Blue
                 </div>
 
-                <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
+                <div className="flex pl-4 text-[14px] border-l-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-l-[#5F5F5F] border-l-solid border-l-2 ">
                   <div className="h-[14px] w-[14px] mr-2 rounded-[50%] bg-[#52C41A]"></div>{" "}
                   Green
                 </div>
 
-                <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
+                <div className="flex pl-4 text-[14px] border-l-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-l-[#5F5F5F] border-l-solid border-l-2 ">
                   <FaPlus size={20} className="mr-2 flex" /> Add More Tags
                 </div>
-              </div>
+              </div> */}
 
               <div className="mb-2">
                 <span className="pl-4 text-[14px] font-[500] mb-3 block text-[#595959]">
                   More
                 </span>
 
-                <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
+                <div className="flex pl-4 text-[14px] border-l-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-l-[#5F5F5F] border-l-solid border-l-2 ">
                   <FaRegClock className="mr-2" size={16} /> Recents
                 </div>
 
-                <div className="flex pl-4 text-[14px] border-r-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-r-[#5F5F5F] border-r-solid border-r-2 ">
+                <div className="flex pl-4 text-[14px] border-l-transparent items-center text-[rgba(0,0,0,0.45)]  hover:text-[#262626] py-2 cursor-pointer transition-all delay-500 hover:bg-[#bfbfbfe1] hover:border-l-[#5F5F5F] border-l-solid border-l-2 ">
                   <FaTrash className="mr-2" size={16} /> Trash
                 </div>
               </div>

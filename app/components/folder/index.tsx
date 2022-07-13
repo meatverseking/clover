@@ -44,7 +44,7 @@ const Folder = ({ color = "#40A9FF", data, pinned = false, shared = false }: { c
       <div className="text-[16px] text-center w-full truncate leading-6 font-[400] text-[#00000073]">
         {files} item{files > 1 ? "s" : ""}
       </div>
-      <div className="text-[13px] text-center w-full -mt-2 truncate leading-6 font-[200] text-[#00000040]">
+      <div className="text-[13px] text-center w-full -mt-2 truncate leading-6 font-[400] text-[#00000040]">
         {mainSize}
       </div>
     </div>
