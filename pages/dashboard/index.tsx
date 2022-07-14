@@ -38,7 +38,6 @@ const Dashboard = () => {
     };
 
     
-    
 
 
     const uploadFiles = (files: FileList) => {
@@ -324,7 +323,7 @@ const Dashboard = () => {
                 />
                 <button
                   onClick={() => {
-                      document.querySelector(".input_upload")?.click();
+                      document?.querySelector(".input_upload")?.click();
                   }}
                   className="py-2 mr-4 st:!hidden flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[120px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]"
                 >
