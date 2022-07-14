@@ -1,9 +1,8 @@
 import Link from 'next/link';
 import { RiLogoutCircleLine, RiSettingsLine } from 'react-icons/ri';
-import { useState } from "react"; 
 import {
   LinearProgress,
-  Button,Paper, InputBase, IconButton, Popper, Box, Fade, 
+  Button, Paper, InputBase, IconButton, Popper, Box, Fade, Tabs, Tab, Typography
 } from "@mui/material"
 
 import user from '../../public/images/user.png';
@@ -17,102 +16,139 @@ import Dash from "../../app/components/dash";
 import Folder from "../../app/components/folder";
 
 import { useMoralis } from "react-moralis";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { GenContext } from "../../app/components/extras/contexts/genContext";
 import { makeStorageClient } from "../../app/components/extras/storage/utoken"
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
 
 const Dashboard = () => {
-  
-    const { Moralis } = useMoralis();
+  const [value, setValue] = useState(0);
 
-    /* upload */
-    const uploadData = useContext(GenContext);
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
 
-    const { upload } = uploadData;
+  const { Moralis } = useMoralis();
 
-    const { success, error, loading } = upload;
+  /* upload */
+  const uploadData = useContext(GenContext);
 
-    const triggerUpload = (w: any) => {
-      uploadFiles(w.files);
-    };
+  const { upload } = uploadData;
 
-    const uploadFiles = (files: FileList) => {
-      let maxSize: number = 0;
-      const blobFiles: File[] = [];
+  const { success, error, loading } = upload;
 
-      for (let i: number = 0; i < files.length; i++) {
-        let startPointer: number = 0;
-        let endPointer: number = files[i].size;
-        maxSize += files[i].size;
-        let chunks: any[] = [files[i].name, files[i].type, []];
-        while (startPointer < endPointer) {
-          let newStartPointer: number = startPointer + files[i].size;
-          chunks[2].push(files[i].slice(startPointer, newStartPointer));
-          startPointer = newStartPointer;
-        }
+  const triggerUpload = (w: any) => {
+    uploadFiles(w.files);
+  };
 
-        blobFiles.push(
-          new File(
-            [new Blob(chunks[2], { type: files[i].type })],
-            files[i].name,
-            {}
-          )
-        );
+  const uploadFiles = (files: FileList) => {
+    let maxSize: number = 0;
+    const blobFiles: File[] = [];
+
+    for (let i: number = 0; i < files.length; i++) {
+      let startPointer: number = 0;
+      let endPointer: number = files[i].size;
+      maxSize += files[i].size;
+      let chunks: any[] = [files[i].name, files[i].type, []];
+      while (startPointer < endPointer) {
+        let newStartPointer: number = startPointer + files[i].size;
+        chunks[2].push(files[i].slice(startPointer, newStartPointer));
+        startPointer = newStartPointer;
       }
 
-      uploadProvider(blobFiles, maxSize);
+      blobFiles.push(
+        new File(
+          [new Blob(chunks[2], { type: files[i].type })],
+          files[i].name,
+          {}
+        )
+      );
+    }
+
+    uploadProvider(blobFiles, maxSize);
+  };
+
+  const dropHere = (event: React.DragEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    event.preventDefault();
+    const fileList = event.dataTransfer.files;
+    uploadFiles(fileList);
+  };
+
+  const dragHere = (event: React.DragEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+  };
+
+
+  const fileData = [];
+
+
+  const uploadProvider = async (files: File[], totalSize: number) => {
+    const onRootCidReady = (cid: string) => {
+      error?.update("");
+      success?.update(true);
+
+      console.log(cid, files[0]);
+
+
     };
 
-    const dropHere = (event: React.DragEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-      event.preventDefault();
-      const fileList = event.dataTransfer.files;
-      uploadFiles(fileList);
+    let uploaded = 0;
+
+    const onStoredChunk = (size: number) => {
+      uploaded += size;
+
+      const pct: number = (uploaded / totalSize) * 100;
+
+      console.log(`Uploading... ${pct.toFixed(2)}% complete`);
+
+      loading?.update(pct);
     };
 
-    const dragHere = (event: React.DragEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "copy";
-    };
 
+    const client = makeStorageClient(await Moralis.Cloud.run("getWeb3StorageKey"));
 
-    const fileData = [];
+    files.forEach((file, i) => {
 
+      return client.put([file], { onRootCidReady, onStoredChunk });
+    })
+  };
 
-    const uploadProvider = async (files: File[], totalSize: number) => {
-      const onRootCidReady = (cid: string) => {
-        error?.update("");
-        success?.update(true);
-
-        console.log(cid, files[0]);
-       
-
-      };
-
-      let uploaded = 0;
-
-      const onStoredChunk = (size: number) => {
-        uploaded += size;
-
-        const pct: number = (uploaded / totalSize) * 100;
-
-        console.log(`Uploading... ${pct.toFixed(2)}% complete`);
-
-        loading?.update(pct);
-      };
-
-
-      const client = makeStorageClient(await Moralis.Cloud.run("getWeb3StorageKey"));
-
-      files.forEach((file, i) => {
-          
-          return client.put([file], { onRootCidReady, onStoredChunk });
-      })
-    }; 
-
-    /*end of upload*/
+  /*end of upload*/
 
 
   const [open, setOpen] = useState(false);
@@ -131,11 +167,11 @@ const Dashboard = () => {
   const [side3, uside3] = useState<boolean>(true);
 
   const mside = () => {
-      uside(!side);
+    uside(!side);
 
-      setTimeout(() => {
-           uside3(!side3);
-      }, 500);
+    setTimeout(() => {
+      uside3(!side3);
+    }, 500);
   }
 
   const sidebar = (color?: string) => (side3 ? <MdMenuOpen color={color} size={30} /> : <MdMenu color={color} size={30} />);
@@ -292,7 +328,14 @@ const Dashboard = () => {
                   {sidebar()}
                 </div>
                 <div className="font-semibold text-[20px] text-black">
-                  My Drive
+                  <Box sx={{ width: '100%' }}>
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                      <Tabs value={value} onChange={handleChange} aria-label="clover">
+                        <Tab label="Chats" {...a11yProps(0)} />
+                        <Tab label="Files" {...a11yProps(1)} />
+                      </Tabs>
+                    </Box>
+                  </Box>
                 </div>
               </div>
               <div className="flex items-center">
@@ -339,75 +382,86 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="px-1">
-              <div className="flex items-center justify-between pt-3">
-                <Paper
-                  component="form"
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    width: "calc(100% - 35px)",
-                    fontSide: 16,
-                    height: 42,
-                    border: "1px solid #00000073",
-                    boxShadow: "none",
-                  }}
-                  onSubmit={() => false}
-                >
-                  <InputBase
-                    sx={{ ml: 1, flex: 1, color: "#999" }}
-                    placeholder="Search File, Folder, Drive name"
-                    inputProps={{ "aria-label": "search" }}
-                  />
-                  <IconButton
-                    type="submit"
-                    sx={{
-                      p: "12px",
-                      borderLeft: "1px solid #00000073",
-                      borderRadius: 0,
+
+
+              <Box>
+                <TabPanel value={value} index={0}>
+                  Chats
+                </TabPanel>
+                <TabPanel value={value} index={1}>
+                  <div className="flex items-center justify-between pt-3">
+                    <Paper
+                      component="form"
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        width: "calc(100% - 35px)",
+                        fontSide: 16,
+                        height: 42,
+                        border: "1px solid #00000073",
+                        boxShadow: "none",
+                      }}
+                      onSubmit={() => false}
+                    >
+                      <InputBase
+                        sx={{ ml: 1, flex: 1, color: "#999" }}
+                        placeholder="Search File, Folder, Drive name"
+                        inputProps={{ "aria-label": "search" }}
+                      />
+                      <IconButton
+                        type="submit"
+                        sx={{
+                          p: "12px",
+                          borderLeft: "1px solid #00000073",
+                          borderRadius: 0,
+                        }}
+                        aria-label="search"
+                      >
+                        <TbSearch size={16.07} color="#00000073" />
+                      </IconButton>
+                    </Paper>
+                    <div className="cursor-pointer">
+                      {false ? (
+                        <BsList size={19} color="#00000073" />
+                      ) : (
+                        <BsGrid3X3Gap size={19} color="#00000073" />
+                      )}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      gridTemplateColumns: "repeat(auto-fill, minmax(186px, 1fr))",
                     }}
-                    aria-label="search"
+                    className="flist pt-7 grid gap-2 grid-flow-dense"
                   >
-                    <TbSearch size={16.07} color="#00000073" />
-                  </IconButton>
-                </Paper>
-                <div className="cursor-pointer">
-                  {false ? (
-                    <BsList size={19} color="#00000073" />
-                  ) : (
-                    <BsGrid3X3Gap size={19} color="#00000073" />
-                  )}
-                </div>
-              </div>
+                    <Folder
+                      data={{
+                        name: "slide",
+                        size: 224,
+                        files: 10,
+                      }}
+                    />
 
-              <div
-                style={{
-                  gridTemplateColumns: "repeat(auto-fill, minmax(186px, 1fr))",
-                }}
-                className="flist pt-7 grid gap-2 grid-flow-dense"
-              >
-                <Folder
-                  data={{
-                    name: "slide",
-                    size: 224,
-                    files: 10,
-                  }}
-                />
+                    <Folder
+                      data={{
+                        name: "slide main",
+                        size: 224,
+                        files: 10,
+                      }}
+                    />
+                  </div>
+                </TabPanel>
+              </Box>
 
-                <Folder
-                  data={{
-                    name: "slide main",
-                    size: 224,
-                    files: 10,
-                  }}
-                />
-              </div>
+
             </div>
           </div>
         </div>
       </div>
     </>
   );
-    
+
 }
 
 
