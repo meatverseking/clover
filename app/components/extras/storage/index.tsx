@@ -5,9 +5,10 @@ import { connect, Connection, SUPPORTED_CHAINS } from "@tableland/sdk";
 
 export type store = {
     name: string,
-    date?: string,
+    date?: string | number,
     type: string,
-    link: string[],
+    cid: string[],
+    link?: string[],
     shared?: string | string[],
     size: number,
     deleted: boolean

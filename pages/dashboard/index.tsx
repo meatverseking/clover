@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { RiLogoutCircleLine, RiSettingsLine } from 'react-icons/ri';
-import { useState } from "react"; 
 import {
   LinearProgress,
   Button,Paper, InputBase, IconButton, Popper, Box, Fade, 
@@ -17,9 +16,10 @@ import Dash from "../../app/components/dash";
 import Folder from "../../app/components/folder";
 
 import { useMoralis } from "react-moralis";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { GenContext } from "../../app/components/extras/contexts/genContext";
 import { makeStorageClient } from "../../app/components/extras/storage/utoken"
+import { store } from '../../app/components/extras/storage';
 
 
 const Dashboard = () => {
@@ -36,6 +36,10 @@ const Dashboard = () => {
     const triggerUpload = (w: any) => {
       uploadFiles(w.files);
     };
+
+    
+    
+
 
     const uploadFiles = (files: FileList) => {
       let maxSize: number = 0;
@@ -56,7 +60,7 @@ const Dashboard = () => {
           new File(
             [new Blob(chunks[2], { type: files[i].type })],
             files[i].name,
-            {}
+            {type: files[i].type, lastModified: files[i].lastModified}
           )
         );
       }
@@ -82,13 +86,22 @@ const Dashboard = () => {
 
 
     const uploadProvider = async (files: File[], totalSize: number) => {
+      let index:number = 0;
       const onRootCidReady = (cid: string) => {
         error?.update("");
         success?.update(true);
 
-        console.log(cid, files[0]);
+        console.log(cid, index);
        
-
+        // const addFiles:store = {
+        //   name: files[index].name,
+        //   date: files[index].lastModified,
+        //   type: files[index].type,
+        //   size: files[index].size,
+        //   cid: [ cid ],
+        //   deleted: false
+        // }
+        index++;
       };
 
       let uploaded = 0;
@@ -107,7 +120,7 @@ const Dashboard = () => {
       const client = makeStorageClient(await Moralis.Cloud.run("getWeb3StorageKey"));
 
       files.forEach((file, i) => {
-          
+
           return client.put([file], { onRootCidReady, onStoredChunk });
       })
     }; 
@@ -170,7 +183,10 @@ const Dashboard = () => {
               </a>
             </Link>
 
-            <div onClick={() => mside()} className="mr-2 hidden st:block cursor-pointer">
+            <div
+              onClick={() => mside()}
+              className="mr-2 hidden st:block cursor-pointer"
+            >
               {sidebar("#1890ff")}
             </div>
           </div>
@@ -296,7 +312,22 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex items-center">
-                <button className="py-2 mr-4 st:!hidden flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[120px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]">
+                <input
+                  type="file"
+                  multiple
+                  onChange={triggerUpload}
+                  className="!hidden input_upload"
+                  style={{
+                    display: "none",
+                    visibility: "hidden",
+                  }}
+                />
+                <button
+                  onClick={() => {
+                      document.querySelector(".input_upload")?.click();
+                  }}
+                  className="py-2 mr-4 st:!hidden flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[120px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]"
+                >
                   <BsCloudUpload size={20} className="min-w-[20px]" />{" "}
                   <span className="mr-4">Upload</span>
                 </button>
