@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 function Chats() {
 
-  if(document){
+  if(typeof window !== 'undefined'){
   const toggleButton = document.querySelector(".dark-light");
   const colors = document.querySelectorAll(".color");
 
@@ -18,7 +18,6 @@ function Chats() {
   toggleButton.addEventListener("click", () => {
     document.body.classList.toggle("dark-mode");
   });
-
 }
   return (
     <div className="app">

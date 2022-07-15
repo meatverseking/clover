@@ -180,11 +180,25 @@ export const storeFiles = async (file: store[], dirfolder: string[]) => {
 };
 
 
-const getFileList = (files: (store | dir)[], dirFolder: string[]) => {
+const getFileList = (files: (store | dir)[], dirFolder: string[], num:number = 1) => {
 
-    files.forEach(file => {
-      
-    })
+    files.forEach((file: any) => {
+      if (file["files"] !== undefined) {
+        if (num !== dirFolder.length - 1) {
+
+          getFileList(file["files"], dirFolder, num + 1);
+
+        } else {
+          if (file["name"] == dirFolder[dirFolder.length - 1]) {
+
+              return file;
+
+          }
+        }
+      }
+    });
+
+    return {};
 
 };
 
@@ -192,12 +206,13 @@ const getFileList = (files: (store | dir)[], dirFolder: string[]) => {
  * @param dirfolder - directory folder till destination seperated by . or undefined
  * eg - main.folder.folder
  * **/
+
 export const retrieveFiles = async (folder?: string[]) => {
   const fileData = await readDFiles();
 
   if (folder !== undefined) {
   
-      getFileList(fileData.files, folder);
+    return getFileList(fileData.files, folder);
 
   } else {
 
