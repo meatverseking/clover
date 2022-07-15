@@ -6,53 +6,59 @@ import { connect, Connection, SUPPORTED_CHAINS } from "@tableland/sdk";
 export type store = {
     name: string,
     date?: string | number,
+    tag: "default" | number | string,
     type: string,
     cid: string[],
     link?: string[],
+    file: boolean,
     shared?: string | string[],
     size: number,
     deleted: boolean
 }
 
-export type fstructure = {
-    [index:string]: store[] | store
+export interface dir { 
+    name: string,
+    deleted: boolean,
+    file: boolean,
+    tag: string | number | 'default'
 }
 
-export type mainStructor = {
-    [index: string]: store | fstructure | (store | fstructure)[]
+export interface fstructure extends dir {
+  files: (store | dir)[];
+}
+
+const updateSearch = (files: (store | dir)[], newFiles: store[], fileFolder: string[], num: number = 1) => {
+
+    files.forEach((data: any) => {
+        if(data['files'] !== undefined){
+            if(num !== fileFolder.length - 1){
+                updateSearch(data['files'], newFiles, fileFolder, num++);
+            } else {
+                if(data['name'] == fileFolder[fileFolder.length - 1]){
+
+                    newFiles.forEach(xx => {
+                        data.files.push(xx)
+                    });          
+
+                    return true;
+                }
+            }
+        }      
+    })
 }
 
 
 
-let tableland:Connection;
+export let userTable:Connection;
 
 //main init
 export const beginStorageProvider = async () => {
-    tableland = await connect(SUPPORTED_CHAINS['polygon-mumbai']);
-}
-
-
-// initializes the user account
-export const createUserTables = async (username:string) => {
-        const { name, txnHash } = await tableland.create(
-          `files text, name text, id int, primary key (id)`, 
-          `userfiles` 
-        );
-
-       const { hash } = await  tableland.write(
-             `INSERT INTO userfiles (id, name, files) VALUES (1, '${username}', '{}');`
-           )
-
-    if (hash !== undefined) {
-        return name;
-    }else{
-        return false;
-    }
+    userTable = await connect(SUPPORTED_CHAINS['polygon-mumbai']);
 }
 
 //gets the full table name
 export const getUserTable = async (table_name:string) => {
-        const tables = await tableland.list();
+        const tables = await userTable.list();
         let realName = "";
         tables.forEach(({ name }: { name: string }) => {
         const real = name.split("_");
@@ -64,22 +70,70 @@ export const getUserTable = async (table_name:string) => {
     return realName;    
 }
 
+export const verifyHash = async (hash: any) => {
+        const receiptRes = await userTable.receipt(
+              hash
+        );
+            if(receiptRes === undefined){
+                setTimeout(() => {
+                     verifyHash(hash);
+                }, 500)
+            }else{
+                return true
+            }
+  }
 
-const readDFiles = async () => {
+// initializes the user account
+export const createUserTables = async (username:string) => {
+      const exists = await getUserTable('userfiles');
+
+      if(!exists.length){
+        const { name, txnHash } = await userTable.create(
+          `files text, name text, id int, primary key (id)`, 
+          `userfiles` 
+        );
+
+        return {create: txnHash};
+
+      }else{
+        return { create: true }
+      }
+}
+
+export const initData:fstructure = {
+  name: "main",
+  tag: "default",
+  files: [],
+  deleted: false,
+  file: false,
+};
+
+export const initDataStorage = async (username: string) => {
+
+      const { hash } = await userTable.write(
+        `INSERT INTO userfiles (id, name, files) VALUES (1, '${username}', '${JSON.stringify(initData)}');`
+      );
+
+      return hash;
+
+}
+
+
+export const readDFiles = async () => {
   const name = getUserTable('userfiles');
 
-  const { rows } = await tableland.read(`SELECT files FROM ${name} WHERE id = 1;`);
+  const { rows } = await userTable.read(`SELECT files FROM ${name} WHERE id = 1;`);
 
   return rows[0][0];
 };
 
-export const updateDFiles = async (files: mainStructor) => {
+export const updateDFiles = async (files: fstructure) => {
   const table = getUserTable("userfiles");
 
   const storeFormat = JSON.stringify(files);
 
-  const xx = await tableland.write(
-    `UPDATE ${table} SET files = '${storeFormat}' where id = '1'`
+  const xx = await userTable.write(
+    `UPDATE ${table} SET files = '${storeFormat}' WHERE id = '1'`
   );
 
   if (xx) {
@@ -111,14 +165,43 @@ export const deleteFile = async (cid: string) => {
 
 }
 
-export const storeFiles = (file: mainStructor) => {
-    
+/**
+ * @param dirfolder: array - showing file directory till destination
+ * **/
+
+export const storeFiles = async (file: store[], dirfolder: string[]) => {
+  const fileData = await readDFiles();
+
+  updateSearch(fileData.files, file, dirfolder);
+
+  await updateDFiles(fileData);
+
+  return fileData;
 };
 
-export const retrieveFiles = (files?: string)/*: fstructure | store | mainStructor*/ => {
-  if (files !== undefined) {
+
+const getFileList = (files: (store | dir)[], dirFolder: string[]) => {
+
+    files.forEach(file => {
+      
+    })
+
+};
+
+/**
+ * @param dirfolder - directory folder till destination seperated by . or undefined
+ * eg - main.folder.folder
+ * **/
+export const retrieveFiles = async (folder?: string[]) => {
+  const fileData = await readDFiles();
+
+  if (folder !== undefined) {
+  
+      getFileList(fileData.files, folder);
 
   } else {
+
+    return fileData;
 
   }
 };

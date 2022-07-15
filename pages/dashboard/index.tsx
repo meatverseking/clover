@@ -19,12 +19,14 @@ import { useMoralis } from "react-moralis";
 import { useContext, useState, useEffect } from "react";
 import { GenContext } from "../../app/components/extras/contexts/genContext";
 import { makeStorageClient } from "../../app/components/extras/storage/utoken"
-import { store } from '../../app/components/extras/storage';
+import { beginStorageProvider, createUserTables, initData, initDataStorage, readDFiles, store, userTable, verifyHash } from '../../app/components/extras/storage';
 
 
 const Dashboard = () => {
   
     const { Moralis } = useMoralis();
+
+    const [ currentDir, setCurrentDir ] = useState<string[]>(['main']);
 
     /* upload */
     const uploadData = useContext(GenContext);
@@ -37,7 +39,33 @@ const Dashboard = () => {
       uploadFiles(w.files);
     };
 
+    const [fileData, setFileData] = useState({});
     
+    beginStorageProvider();
+
+    const [ init, setInit ] = useState(createUserTables("Joel George"));//replace Joel George with user name
+
+
+
+    useEffect(() => {
+      init.then((xx) => {
+        if (xx.create === true) {
+          const json = readDFiles();
+
+          json.then((d) => {
+            setFileData(JSON.parse(d));
+          });
+        } else {
+          verifyHash(xx.create).then((c) => {
+            if (c === true) {
+              initDataStorage("Joel George");
+              setFileData(initData);
+            }
+          })
+        }
+      });
+    }, [fileData, init]);
+
 
 
     const uploadFiles = (files: FileList) => {
@@ -80,10 +108,6 @@ const Dashboard = () => {
       event.dataTransfer.dropEffect = "copy";
     };
 
-
-    const fileData = [];
-
-
     const uploadProvider = async (files: File[], totalSize: number) => {
       let index:number = 0;
       const onRootCidReady = (cid: string) => {
@@ -125,6 +149,8 @@ const Dashboard = () => {
     }; 
 
     /*end of upload*/
+
+
 
 
   const [open, setOpen] = useState(false);
@@ -323,7 +349,9 @@ const Dashboard = () => {
                 />
                 <button
                   onClick={() => {
-                      document?.querySelector(".input_upload")?.click();
+                      const elem = document?.querySelector(".input_upload") as HTMLElement;
+
+                      elem?.click();
                   }}
                   className="py-2 mr-4 st:!hidden flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[120px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]"
                 >

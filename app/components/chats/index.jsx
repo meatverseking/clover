@@ -1,5 +1,9 @@
 import Image from 'next/image'
-const toggleButton = document.querySelector(".dark-light");
+
+function Chats() {
+
+  if(document){
+  const toggleButton = document.querySelector(".dark-light");
   const colors = document.querySelectorAll(".color");
 
   colors.forEach(color => {
@@ -14,11 +18,8 @@ const toggleButton = document.querySelector(".dark-light");
   toggleButton.addEventListener("click", () => {
     document.body.classList.toggle("dark-mode");
   });
-  
-function Chats() {
-  // const toggleButton = document.querySelector(".dark-light");
-  
 
+}
   return (
     <div className="app">
       <div className="header">
