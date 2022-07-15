@@ -1,4 +1,5 @@
 import '../styles/globals.css'
+import '../styles/index.css'
 import type { AppProps } from 'next/app'
 import { MoralisProvider } from 'react-moralis'
 import { GenProvider } from '../app/components/extras/contexts/genContext'
