@@ -32,6 +32,15 @@ function Chats() {
           <input type="text" placeholder="Search..." />
         </div>
         <div className="user-settings">
+          <div className="detail-change">
+              Change Color
+              <div className="colors">
+                <div className="color blue selected" data-color="blue"></div>
+                <div className="color purple" data-color="purple"></div>
+                <div className="color green" data-color="green"></div>
+                <div className="color orange" data-color="orange"></div>
+              </div>
+            </div>
           <div className="dark-light">
             <svg viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
@@ -195,15 +204,7 @@ function Chats() {
           <div className="detail-changes">
             <input type="text" placeholder="Search in Conversation">
             </input>
-            <div className="detail-change">
-              Change Color
-              <div className="colors">
-                <div className="color blue selected" data-color="blue"></div>
-                <div className="color purple" data-color="purple"></div>
-                <div className="color green" data-color="green"></div>
-                <div className="color orange" data-color="orange"></div>
-              </div>
-            </div>
+            
             <div className="detail-change">
               Change Emoji
               <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-thumbs-up">
