@@ -2,23 +2,23 @@ import Image from 'next/image'
 
 function Chats() {
 
-  if(typeof window !== 'undefined'){
-  const toggleButton = document.querySelector(".dark-light");
-  const colors = document.querySelectorAll(".color");
+  if (typeof window !== 'undefined') {
+    const toggleButton = document.querySelector(".dark-light");
+    const colors = document.querySelectorAll(".color");
 
-  colors.forEach(color => {
-    color.addEventListener("click", e => {
-      colors.forEach(c => c.classList.remove("selected"));
-      const theme = color.getAttribute("data-color");
-      document.body.setAttribute("data-theme", theme);
-      color.classList.add("selected");
+    colors.forEach(color => {
+      color.addEventListener("click", e => {
+        colors.forEach(c => c.classList.remove("selected"));
+        const theme = color.getAttribute("data-color");
+        document.body.setAttribute("data-theme", theme);
+        color.classList.add("selected");
+      });
     });
-  });
 
-  toggleButton.addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
-  });
-}
+    toggleButton.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+    });
+  }
   return (
     <div className="app">
       <div className="header">
@@ -33,16 +33,16 @@ function Chats() {
         </div>
         <div className="user-settings">
           <div className="detail-change">
-              Change Color
-              <div className="colors">
-                <div className="color blue selected" data-color="blue"></div>
-                <div className="color purple" data-color="purple"></div>
-                <div className="color green" data-color="green"></div>
-                <div className="color orange" data-color="orange"></div>
-              </div>
+            Change Color
+            <div className="colors">
+              <div className="color blue selected" data-color="blue"></div>
+              <div className="color purple" data-color="purple"></div>
+              <div className="color green" data-color="green"></div>
+              <div className="color orange" data-color="orange"></div>
             </div>
+          </div>
           <div className="dark-light">
-            <svg viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewbox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
             </svg>
           </div>
@@ -187,13 +187,13 @@ function Chats() {
             <div className="detail-subtitle">Created by Aysenur, 1 May 2020</div>
             <div className="detail-buttons">
               <button className="detail-button">
-                <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" stroke="currentColor" strokeWidth="0" strokeLinecap="round" strokeLinejoin="round" className="feather feather-phone">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" stroke="currentColor" strokeWidth="0" strokeLinecap="round" strokeLinejoin="round" className="feather feather-phone">
                   <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
                 </svg>
                 Call Group
               </button>
               <button className="detail-button">
-                <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" stroke="currentColor" strokeWidth="0" strokeLinecap="round" strokeLinejoin="round" className="feather feather-video">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" stroke="currentColor" strokeWidth="0" strokeLinecap="round" strokeLinejoin="round" className="feather feather-video">
                   <path d="M23 7l-7 5 7 5V7z" />
                   <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
                 </svg>
@@ -204,10 +204,10 @@ function Chats() {
           <div className="detail-changes">
             <input type="text" placeholder="Search in Conversation">
             </input>
-            
+
             <div className="detail-change">
               Change Emoji
-              <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-thumbs-up">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-thumbs-up">
                 <path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" />
               </svg>
             </div>
