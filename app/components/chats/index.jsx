@@ -32,6 +32,15 @@ function Chats() {
           <input type="text" placeholder="Search..." />
         </div>
         <div className="user-settings">
+          <div className="detail-change">
+              Change Color
+              <div className="colors">
+                <div className="color blue selected" data-color="blue"></div>
+                <div className="color purple" data-color="purple"></div>
+                <div className="color green" data-color="green"></div>
+                <div className="color orange" data-color="orange"></div>
+              </div>
+            </div>
           <div className="dark-light">
             <svg viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
@@ -43,157 +52,37 @@ function Chats() {
               <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
             </svg>
           </div>
-          <Image alt="" className="user-profile account-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png" />
+          {/* <Image alt="" className="user-profile account-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png" width={30} /> */}
         </div>
       </div>
       <div className="wrapper">
-        <div className="conversation-area">
-          <div className="msg online">
-            <Image alt="" className="msg-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png" />
-            <div className="msg-detail">
-              <div className="msg-username">Madison Jones</div>
-              <div className="msg-content">
-                <span className="msg-message">What time was our meet</span>
-                <span className="msg-date">20m</span>
-              </div>
-            </div>
-          </div>
-          <div className="msg">
-            <Image alt="" className="msg-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%2812%29.png" />
-            <div className="msg-detail">
-              <div className="msg-username">Miguel Cohen</div>
-              <div className="msg-content">
-                <span className="msg-message">Adaptogen taiyaki austin jean shorts brunch</span>
-                <span className="msg-date">20m</span>
-              </div>
-            </div>
-          </div>
-          <div className="msg active">
-            <div className="msg-profile group">
-              <svg viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="css-i6dzq1">
-                <path d="M12 2l10 6.5v7L12 22 2 15.5v-7L12 2zM12 22v-6.5" />
-                <path d="M22 8.5l-10 7-10-7" />
-                <path d="M2 15.5l10-7 10 7M12 2v6.5" />
-              </svg>
-            </div>
-            <div className="msg-detail">
-              <div className="msg-username">CodePen Group</div>
-              <div className="msg-content">
-                <span className="msg-message">Aysenur: I love CSS</span>
-                <span className="msg-date">28m</span>
-              </div>
-            </div>
-          </div>
-          <div className="msg online">
-            <Image alt="" className="msg-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%282%29.png" />
-            <div className="msg-detail">
-              <div className="msg-username">Lea Debere</div>
-              <div className="msg-content">
-                <span className="msg-message">Shoreditch iPhone jianbing</span>
-                <span className="msg-date">45m</span>
-              </div>
-            </div>
-          </div>
-          <div className="msg online">
-            <Image alt="" className="msg-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29+%281%29.png" />
-            <div className="msg-detail">
-              <div className="msg-username">Jordan Smith</div>
-              <div className="msg-content">
-                <span className="msg-message">Snackwave craft beer raclette, beard kombucha </span>
-                <span className="msg-date">2h</span>
-              </div>
-            </div>
-          </div>
-          <div className="msg">
-            <Image alt="" className="msg-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%284%29+%281%29.png" />
-            <div className="msg-detail">
-              <div className="msg-username">Jared Jackson</div>
-              <div className="msg-content">
-                <span className="msg-message">Tattooed brooklyn typewriter gastropub</span>
-                <span className="msg-date">18m</span>
-              </div>
-            </div>
-          </div>
-          <div className="msg online">
-            <Image alt="" className="msg-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%283%29+%281%29.png" />
-            <div className="msg-detail">
-              <div className="msg-username">Henry Clark</div>
-              <div className="msg-content">
-                <span className="msg-message">Ethical typewriter williamsburg lo-fi street art</span>
-                <span className="msg-date">2h</span>
-              </div>
-            </div>
-          </div>
-          <div className="msg">
-            <Image alt="" className="msg-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/qs6F3dgm.png" />
-            <div className="msg-detail">
-              <div className="msg-username">Jason Mraz</div>
-              <div className="msg-content">
-                <span className="msg-message">I`&#39`m lucky I`&#39`m in love with my best friend</span>
-                <span className="msg-date">4h</span>
-              </div>
-            </div>
-          </div>
-          <div className="msg">
-            <Image alt="" className="msg-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%288%29.png" />
-            <div className="msg-detail">
-              <div className="msg-username">Chiwa Lauren</div>
-              <div className="msg-content">
-                <span className="msg-message">Pabst af 3 wolf moon</span>
-                <span className="msg-date">28m</span>
-              </div>
-            </div>
-          </div>
-          <div className="msg">
-            <Image alt="" className="msg-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%289%29.png" />
-            <div className="msg-detail">
-              <div className="msg-username">Caroline Orange</div>
-              <div className="msg-content">
-                <span className="msg-message">Bespoke aesthetic lyft woke cornhole</span>
-                <span className="msg-date">35m</span>
-              </div>
-            </div>
-          </div>
-          <div className="msg">
-            <Image alt="" className="msg-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%286%29.png" />
-            <div className="msg-detail">
-              <div className="msg-username">Lina Ashma</div>
-              <div className="msg-content">
-                <span className="msg-message">Migas food truck crucifix vexi</span>
-                <span className="msg-date">42m</span>
-              </div>
-            </div>
-          </div>
-          <button className="add"></button>
-          <div className="overlay"></div>
-        </div>
         <div className="chat-area">
           <div className="chat-area-header">
             <div className="chat-area-title">CodePen Group</div>
             <div className="chat-area-group">
-              <Image alt="" className="chat-area-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%283%29+%281%29.png" />
+              {/* <Image alt="" className="chat-area-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%283%29+%281%29.png" />
               <Image alt="" className="chat-area-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%282%29.png" />
-              <Image alt="" className="chat-area-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%2812%29.png" />
+              <Image alt="" className="chat-area-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%2812%29.png" /> */}
               <span>+4</span>
             </div>
           </div>
           <div className="chat-area-main">
             <div className="chat-msg">
               <div className="chat-msg-profile">
-                <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%283%29+%281%29.png" />
+                {/* <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%283%29+%281%29.png" /> */}
                 <div className="chat-msg-date">Message seen 1.22pm</div>
               </div>
               <div className="chat-msg-content">
                 <div className="chat-msg-text">Luctus et ultrices posuere cubilia curae.</div>
                 <div className="chat-msg-text">
-                  <Image alt="" src="https://media0.giphy.com/media/yYSSBtDgbbRzq/giphy.gif?cid=ecf05e47344fb5d835f832a976d1007c241548cc4eea4e7e&rid=giphy.gif" />
+                  {/* <Image alt="" src="https://media0.giphy.com/media/yYSSBtDgbbRzq/giphy.gif?cid=ecf05e47344fb5d835f832a976d1007c241548cc4eea4e7e&rid=giphy.gif" /> */}
                 </div>
                 <div className="chat-msg-text">Neque gravida in fermentum et sollicitudin ac orci phasellus egestas. Pretium lectus quam id leo.</div>
               </div>
             </div>
             <div className="chat-msg owner">
               <div className="chat-msg-profile">
-                <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png" />
+                {/* <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png" width={30} /> */}
                 <div className="chat-msg-date">Message seen 1.22pm</div>
               </div>
               <div className="chat-msg-content">
@@ -203,7 +92,7 @@ function Chats() {
             </div>
             <div className="chat-msg">
               <div className="chat-msg-profile">
-                <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%282%29.png" />
+                {/* <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%282%29.png" width={30} /> */}
                 <div className="chat-msg-date">Message seen 2.45pm</div>
               </div>
               <div className="chat-msg-content">
@@ -213,7 +102,7 @@ function Chats() {
             </div>
             <div className="chat-msg owner">
               <div className="chat-msg-profile">
-                <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png" />
+                {/* <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png" width={30} /> */}
                 <div className="chat-msg-date">Message seen 2.50pm</div>
               </div>
               <div className="chat-msg-content">
@@ -223,7 +112,7 @@ function Chats() {
             </div>
             <div className="chat-msg">
               <div className="chat-msg-profile">
-                <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%2812%29.png" />
+                {/* <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%2812%29.png" width={30} /> */}
                 <div className="chat-msg-date">Message seen 3.16pm</div>
               </div>
               <div className="chat-msg-content">
@@ -232,7 +121,7 @@ function Chats() {
             </div>
             <div className="chat-msg">
               <div className="chat-msg-profile">
-                <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%283%29+%281%29.png" />
+                {/* <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%283%29+%281%29.png" width={30} /> */}
                 <div className="chat-msg-date">Message seen 3.16pm</div>
               </div>
               <div className="chat-msg-content">
@@ -241,7 +130,7 @@ function Chats() {
             </div>
             <div className="chat-msg owner">
               <div className="chat-msg-profile">
-                <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png" />
+                {/* <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png" /> */}
                 <div className="chat-msg-date">Message seen 2.50pm</div>
               </div>
               <div className="chat-msg-content">
@@ -250,7 +139,7 @@ function Chats() {
             </div>
             <div className="chat-msg">
               <div className="chat-msg-profile">
-                <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%282%29.png" />
+                {/* <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%282%29.png" /> */}
                 <div className="chat-msg-date">Message seen 3.16pm</div>
               </div>
               <div className="chat-msg-content">
@@ -315,15 +204,7 @@ function Chats() {
           <div className="detail-changes">
             <input type="text" placeholder="Search in Conversation">
             </input>
-            <div className="detail-change">
-              Change Color
-              <div className="colors">
-                <div className="color blue selected" data-color="blue"></div>
-                <div className="color purple" data-color="purple"></div>
-                <div className="color green" data-color="green"></div>
-                <div className="color orange" data-color="orange"></div>
-              </div>
-            </div>
+            
             <div className="detail-change">
               Change Emoji
               <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-thumbs-up">
@@ -331,44 +212,6 @@ function Chats() {
               </svg>
             </div>
           </div>
-          <div className="detail-photos">
-            <div className="detail-photo-title">
-              <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-image">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" />
-              </svg>
-              Shared photos
-            </div>
-            <div className="detail-photo-grid">
-              <Image alt="" src="https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2168&q=80" />
-              <Image alt="" src="https://images.unsplash.com/photo-1516085216930-c93a002a8b01?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80" />
-              <Image alt="" src="https://images.unsplash.com/photo-1458819714733-e5ab3d536722?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=933&q=80" />
-              <Image alt="" src="https://images.unsplash.com/photo-1520013817300-1f4c1cb245ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2287&q=80" />
-              <Image alt="" src="https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2247&q=80" />
-              <Image alt="" src="https://images.unsplash.com/photo-1559181567-c3190ca9959b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80" />
-              <Image alt="" src="https://images.unsplash.com/photo-1560393464-5c69a73c5770?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1301&q=80" />
-              <Image alt="" src="https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2249&q=80" />
-              <Image alt="" src="https://images.unsplash.com/photo-1481349518771-20055b2a7b24?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2309&q=80" />
-
-              <Image alt="" src="https://images.unsplash.com/photo-1473170611423-22489201d919?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2251&q=80" />
-              <Image alt="" src="https://images.unsplash.com/photo-1579613832111-ac7dfcc7723f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80" />
-              <Image alt="" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2189&q=80" />
-            </div>
-            <div className="view-more">View More</div>
-          </div>
-          <a href="https://twitter.com/AysnrTrkk" className="follow-me" target="_blank" rel="noreferrer">
-            <span className="follow-text">
-              <svg viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="css-i6dzq1">
-                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
-              </svg>
-              Follow me on Twitter
-            </span>
-            <span className="developer">
-              <Image alt="" src="https://pbs.twimg.com/profile_images/1253782473953157124/x56UURmt_400x400.jpg" />
-              Aysenur Turk — @AysnrTrkk
-            </span>
-          </a>
         </div>
       </div>
     </div>
