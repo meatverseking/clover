@@ -10,7 +10,7 @@ import Image from 'next/image'
 
 import { FaRegFolderOpen, FaPlus, FaFolder, FaTrash, FaRegClock } from 'react-icons/fa';
 import { MdMenuOpen, MdMenu } from "react-icons/md";
-import { BsCloudUpload, BsCloudy, BsFillCloudUploadFill, BsGrid3X3Gap, BsList, BsPeople, BsPinAngle } from "react-icons/bs";
+import { BsChatText, BsChatTextFill, BsCloudUpload, BsCloudy, BsFillCloudUploadFill, BsGrid3X3Gap, BsList, BsPeople, BsPinAngle } from "react-icons/bs";
 import { TbSearch } from 'react-icons/tb';
 import Dash from "../../app/components/dash";
 import Folder from "../../app/components/folder";
@@ -34,8 +34,10 @@ const Dashboard = () => {
 
   const { success, error, loading } = upload;
 
-  const triggerUpload = (w: any) => {
-    uploadFiles(w.files);
+  const triggerUpload = (w: React.SyntheticEvent & { target: HTMLInputElement }) => {
+    if (w.target.files) {
+      uploadFiles(w.target.files);
+    }
   };
 
   const [fileData, setFileData] = useState({});
@@ -195,9 +197,23 @@ const Dashboard = () => {
         }}
         className="w-full flex items-start justify-between filedrop min-h-screen"
       >
-        <button className="py-2 mr-4 hidden st:flex fixed right-0 bottom-[10px] justify-center z-[90] items-center px-4 bg-[#1890FF] text-white w-[60px] h-[60px] rounded-[50%] overflow-hidden transition-all delay-500 hover:bg-[#0c75d6] font-[300]">
+        <button className="py-2 mr-4 hidden st:flex fixed right-[70px] bottom-[10px] justify-center z-[90] items-center px-4 bg-[#1890FF] text-white w-[60px] h-[60px] rounded-[50%] overflow-hidden transition-all delay-500 hover:bg-[#0c75d6] font-[300]">
+          <BsChatTextFill size={30} />
+        </button>
+
+        <button
+          onClick={() => {
+            const elem = document?.querySelector(
+              ".input_upload"
+            ) as HTMLElement;
+
+            elem?.click();
+          }}
+          className="py-2 mr-4 hidden st:flex fixed right-0 bottom-[10px] justify-center z-[90] items-center px-4 bg-[#1890FF] text-white w-[60px] h-[60px] rounded-[50%] overflow-hidden transition-all delay-500 hover:bg-[#0c75d6] font-[300]"
+        >
           <BsFillCloudUploadFill size={30} />
         </button>
+
         <div
           style={{
             width: side ? 236 : 0,
@@ -328,7 +344,7 @@ const Dashboard = () => {
           style={{
             paddingLeft: side ? 236 : 0,
           }}
-          className="w-full st:!pl-0 transition-all delay-500 h-full flex flex-col"
+          className="w-full st:!pl-0 pb-[65px] transition-all delay-500 h-full flex flex-col"
         >
           <div className="px-5 h-full">
             <div className="flex justify-between items-center py-4">
@@ -351,6 +367,7 @@ const Dashboard = () => {
                     visibility: "hidden",
                   }}
                 />
+
                 <button
                   onClick={() => {
                     const elem = document?.querySelector(
@@ -363,6 +380,10 @@ const Dashboard = () => {
                 >
                   <BsCloudUpload size={20} className="min-w-[20px]" />{" "}
                   <span className="mr-4">Upload</span>
+                </button>
+
+                <button className="py-4 mr-4 st:!hidden flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[148px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]">
+                  <BsChatText size={20} className="min-w-[20px]" />
                 </button>
 
                 <div
