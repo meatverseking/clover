@@ -4,7 +4,7 @@ import {
   LinearProgress,
   Button,Paper, InputBase, IconButton, Popper, Box, Fade, 
 } from "@mui/material"
-
+import logo from '../../public/images/logo.png';
 import user from '../../public/images/user.png';
 import Image from 'next/image'
 
@@ -23,135 +23,135 @@ import { beginStorageProvider, createUserTables, initData, initDataStorage, read
 
 
 const Dashboard = () => {
-  
-    const { Moralis } = useMoralis();
+  const { Moralis } = useMoralis();
 
-    const [ currentDir, setCurrentDir ] = useState<string[]>(['main']);
+  const [currentDir, setCurrentDir] = useState<string[]>(["main"]);
 
-    /* upload */
-    const uploadData = useContext(GenContext);
+  /* upload */
+  const uploadData = useContext(GenContext);
 
-    const { upload } = uploadData;
+  const { upload } = uploadData;
 
-    const { success, error, loading } = upload;
+  const { success, error, loading } = upload;
 
-    const triggerUpload = (w: any) => {
-      uploadFiles(w.files);
-    };
+  const triggerUpload = (w: any) => {
+    uploadFiles(w.files);
+  };
 
-    const [fileData, setFileData] = useState({});
-    
-    beginStorageProvider();
+  const [fileData, setFileData] = useState({});
 
-    const [ init, setInit ] = useState(createUserTables("Joel George"));//replace Joel George with user name
+  const [init, setInit] = useState<any>(''); //replace Joel George with user name
 
+  beginStorageProvider().then(x => {
 
+      // setInit(createUserTables("Joel George"));
 
-    useEffect(() => {
-      init.then((xx) => {
-        if (xx.create === true) {
-          const json = readDFiles();
+      console.log(x)
 
-          json.then((d) => {
-            setFileData(JSON.parse(d));
-          });
-        } else {
-          verifyHash(xx.create).then((c) => {
-            if (c === true) {
-              initDataStorage("Joel George");
-              setFileData(initData);
-            }
-          })
-        }
-      });
-    }, [fileData, init]);
+  });
 
+  useEffect(() => {
+    // if(typeof init != 'string'){
+    // init.then((xx:any) => {
+    //   if (xx.create === true) {
+    //     const dfiles = readDFiles();
 
+    //     dfiles.then((d) => {
+    //       setFileData(typeof d == "string" ? JSON.parse(d) : d);
+    //     });
+    //   } else {
+    //     verifyHash(xx.create).then((c) => {
+    //       if (c === true) {
+    //         initDataStorage("Joel George");
+    //         setFileData(initData);
+    //       }
+    //     });
+    //   }
+    // });
+  // }
+  }, [fileData, init]);
 
-    const uploadFiles = (files: FileList) => {
-      let maxSize: number = 0;
-      const blobFiles: File[] = [];
+  const uploadFiles = (files: FileList) => {
+    let maxSize: number = 0;
+    const blobFiles: File[] = [];
 
-      for (let i: number = 0; i < files.length; i++) {
-        let startPointer: number = 0;
-        let endPointer: number = files[i].size;
-        maxSize += files[i].size;
-        let chunks: any[] = [files[i].name, files[i].type, []];
-        while (startPointer < endPointer) {
-          let newStartPointer: number = startPointer + files[i].size;
-          chunks[2].push(files[i].slice(startPointer, newStartPointer));
-          startPointer = newStartPointer;
-        }
-
-        blobFiles.push(
-          new File(
-            [new Blob(chunks[2], { type: files[i].type })],
-            files[i].name,
-            {type: files[i].type, lastModified: files[i].lastModified}
-          )
-        );
+    for (let i: number = 0; i < files.length; i++) {
+      let startPointer: number = 0;
+      let endPointer: number = files[i].size;
+      maxSize += files[i].size;
+      let chunks: any[] = [files[i].name, files[i].type, []];
+      while (startPointer < endPointer) {
+        let newStartPointer: number = startPointer + files[i].size;
+        chunks[2].push(files[i].slice(startPointer, newStartPointer));
+        startPointer = newStartPointer;
       }
 
-      uploadProvider(blobFiles, maxSize);
+      blobFiles.push(
+        new File(
+          [new Blob(chunks[2], { type: files[i].type })],
+          files[i].name,
+          { type: files[i].type, lastModified: files[i].lastModified }
+        )
+      );
+    }
+
+    uploadProvider(blobFiles, maxSize);
+  };
+
+  const dropHere = (event: React.DragEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    event.preventDefault();
+    const fileList = event.dataTransfer.files;
+    uploadFiles(fileList);
+  };
+
+  const dragHere = (event: React.DragEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+  };
+
+  const uploadProvider = async (files: File[], totalSize: number) => {
+    let index: number = 0;
+    const onRootCidReady = (cid: string) => {
+      error?.update("");
+      success?.update(true);
+
+      console.log(cid, index);
+
+      // const addFiles:store = {
+      //   name: files[index].name,
+      //   date: files[index].lastModified,
+      //   type: files[index].type,
+      //   size: files[index].size,
+      //   cid: [ cid ],
+      //   deleted: false
+      // }
+      index++;
     };
 
-    const dropHere = (event: React.DragEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-      event.preventDefault();
-      const fileList = event.dataTransfer.files;
-      uploadFiles(fileList);
+    let uploaded = 0;
+
+    const onStoredChunk = (size: number) => {
+      uploaded += size;
+
+      const pct: number = (uploaded / totalSize) * 100;
+
+      console.log(`Uploading... ${pct.toFixed(2)}% complete`);
+
+      loading?.update(pct);
     };
 
-    const dragHere = (event: React.DragEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "copy";
-    };
+    const client = makeStorageClient(
+      await Moralis.Cloud.run("getWeb3StorageKey")
+    );
 
-    const uploadProvider = async (files: File[], totalSize: number) => {
-      let index:number = 0;
-      const onRootCidReady = (cid: string) => {
-        error?.update("");
-        success?.update(true);
+    files.forEach((file, i) => {
+      return client.put([file], { onRootCidReady, onStoredChunk });
+    });
+  };
 
-        console.log(cid, index);
-       
-        // const addFiles:store = {
-        //   name: files[index].name,
-        //   date: files[index].lastModified,
-        //   type: files[index].type,
-        //   size: files[index].size,
-        //   cid: [ cid ],
-        //   deleted: false
-        // }
-        index++;
-      };
-
-      let uploaded = 0;
-
-      const onStoredChunk = (size: number) => {
-        uploaded += size;
-
-        const pct: number = (uploaded / totalSize) * 100;
-
-        console.log(`Uploading... ${pct.toFixed(2)}% complete`);
-
-        loading?.update(pct);
-      };
-
-
-      const client = makeStorageClient(await Moralis.Cloud.run("getWeb3StorageKey"));
-
-      files.forEach((file, i) => {
-
-          return client.put([file], { onRootCidReady, onStoredChunk });
-      })
-    }; 
-
-    /*end of upload*/
-
-
-
+  /*end of upload*/
 
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -169,14 +169,19 @@ const Dashboard = () => {
   const [side3, uside3] = useState<boolean>(true);
 
   const mside = () => {
-      uside(!side);
+    uside(!side);
 
-      setTimeout(() => {
-           uside3(!side3);
-      }, 500);
-  }
+    setTimeout(() => {
+      uside3(!side3);
+    }, 500);
+  };
 
-  const sidebar = (color?: string) => (side3 ? <MdMenuOpen color={color} size={30} /> : <MdMenu color={color} size={30} />);
+  const sidebar = (color?: string) =>
+    side3 ? (
+      <MdMenuOpen color={color} size={30} />
+    ) : (
+      <MdMenu color={color} size={30} />
+    );
 
   return (
     <>
@@ -203,13 +208,12 @@ const Dashboard = () => {
           <div className="mt-[1.6rem] st:flex st:justify-between st:items-center mb-[1.24rem]">
             <Link href="/">
               <a className="text-[#1890FF] cursor-pointer flex pl-4 items-center font-bold text-[18px]">
-                <FaFolder size={25} className="mr-2 flex" color={"#1890FF"} />
-                ClearCloud
+                <Image src={logo} width={100} height={33.33} alt="clover" />
               </a>
             </Link>
 
             <div
-              onClick={() => mside()}
+              onClick={mside}
               className="mr-2 hidden st:block cursor-pointer"
             >
               {sidebar("#1890ff")}
@@ -349,9 +353,11 @@ const Dashboard = () => {
                 />
                 <button
                   onClick={() => {
-                      const elem = document?.querySelector(".input_upload") as HTMLElement;
+                    const elem = document?.querySelector(
+                      ".input_upload"
+                    ) as HTMLElement;
 
-                      elem?.click();
+                    elem?.click();
                   }}
                   className="py-2 mr-4 st:!hidden flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[120px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]"
                 >
@@ -465,8 +471,7 @@ const Dashboard = () => {
       </div>
     </>
   );
-    
-}
+};
 
 
 export default Dashboard;

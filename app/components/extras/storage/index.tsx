@@ -109,9 +109,9 @@ export const initData:fstructure = {
 };
 
 export const initDataStorage = async (username: string) => {
-
+      const store = JSON.stringify(initData);
       const { hash } = await userTable.write(
-        `INSERT INTO userfiles (id, name, files) VALUES (1, '${username}', '${JSON.stringify(initData)}');`
+        `INSERT INTO userfiles (id, name, files) VALUES (1, '${username}', '${store}');`
       );
 
       return hash;
@@ -120,7 +120,7 @@ export const initDataStorage = async (username: string) => {
 
 
 export const readDFiles = async () => {
-  const name = getUserTable('userfiles');
+  const name = await getUserTable('userfiles');
 
   const { rows } = await userTable.read(`SELECT files FROM ${name} WHERE id = 1;`);
 
@@ -128,7 +128,7 @@ export const readDFiles = async () => {
 };
 
 export const updateDFiles = async (files: fstructure) => {
-  const table = getUserTable("userfiles");
+  const table = await getUserTable("userfiles");
 
   const storeFormat = JSON.stringify(files);
 
