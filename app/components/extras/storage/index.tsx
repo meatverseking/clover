@@ -9,7 +9,8 @@ export type store = {
     tag: "default" | number | string,
     type: string,
     cid: string[],
-    link?: string[],
+    extension: string | undefined,
+    links?: string[],
     file: boolean,
     shared?: string | string[],
     size: number,
@@ -20,6 +21,7 @@ export interface dir {
     name: string,
     deleted: boolean,
     file: boolean,
+    links?: string[],
     tag: string | number | 'default'
 }
 
@@ -27,47 +29,78 @@ export interface fstructure extends dir {
   files: (store | dir)[];
 }
 
-const updateSearch = (files: (store | dir)[], newFiles: store[], fileFolder: string[], num: number = 1) => {
-
+const updateSearch = (files: (store | dir)[], newFiles: store[], fileFolder: string[],update: boolean = true, num: number = 1) => {
+    if (fileFolder.length > 1) {
     files.forEach((data: any) => {
         if(data['files'] !== undefined){
             if(num !== fileFolder.length - 1){
-                updateSearch(data['files'], newFiles, fileFolder, num++);
+                updateSearch(data['files'], newFiles, fileFolder, update, num++);
             } else {
-                if(data['name'] == fileFolder[fileFolder.length - 1]){
 
+              if(update){
+                if(data['name'] == fileFolder[fileFolder.length - 1]){
                     newFiles.forEach(xx => {
                         data.files.push(xx)
                     });          
 
                     return true;
                 }
+              }
             }
-        }      
+        }    
     })
+  }else{
+      newFiles.forEach(xx => {
+          if(!update){
+          files.push(xx)
+          }else{
+            files.forEach((e:(dir | store), ix:number) => {
+                if(e.name == xx.name){
+                    files[ix] = xx;
+                }
+            })
+          }
+      }); 
+  }
 }
 
 
 
 export let userTable:Connection;
+export let tableName:any = '';
+let tables: any[] = [];
 
 //main init
 export const beginStorageProvider = async () => {
     userTable = await connect(SUPPORTED_CHAINS['polygon-mumbai']);
+
+    tableName = await getUserTable('userfiles');
+
+    console.log(tableName)
+
 }
 
 //gets the full table name
-export const getUserTable = async (table_name:string) => {
-        const tables = await userTable.list();
+export const getUserTable = async (table_name?:string) => {
+
+        if(!tables.length){
+        tables = await userTable.list();
+        }
+
         let realName = "";
+        if(table_name !== undefined){
         tables.forEach(({ name }: { name: string }) => {
         const real = name.split("_");
+
         if (real[0] === table_name) {
             realName = name;
         }
     });
+    return realName;
+  }else{
+      return tables;
+  }    
 
-    return realName;    
 }
 
 export const verifyHash = async (hash: any) => {
@@ -84,11 +117,10 @@ export const verifyHash = async (hash: any) => {
   }
 
 // initializes the user account
-export const createUserTables = async (username:string) => {
-      const exists = await getUserTable('userfiles');
+export const createUserTables = async () => {
 
-      if(!exists.length){
-        const { name, txnHash } = await userTable.create(
+      if(!tableName.length){
+        const { txnHash } = await userTable.create(
           `files text, name text, id int, primary key (id)`, 
           `userfiles` 
         );
@@ -96,7 +128,9 @@ export const createUserTables = async (username:string) => {
         return {create: txnHash};
 
       }else{
+
         return { create: true }
+
       }
 }
 
@@ -109,31 +143,38 @@ export const initData:fstructure = {
 };
 
 export const initDataStorage = async (username: string) => {
+
+      const read = await readDFiles(tableName);
+      if(!read){
       const store = JSON.stringify(initData);
       const { hash } = await userTable.write(
-        `INSERT INTO userfiles (id, name, files) VALUES (1, '${username}', '${store}');`
+        `INSERT INTO ${tableName} (id, name, files) VALUES (1, '${username}', '${store}');`
       );
 
       return hash;
 
+    }else{
+      return false;
+    }
 }
 
 
-export const readDFiles = async () => {
-  const name = await getUserTable('userfiles');
+export const readDFiles = async (name: any) => {
 
-  const { rows } = await userTable.read(`SELECT files FROM ${name} WHERE id = 1;`);
+  const { rows } = await userTable.read(`SELECT * FROM ${name} WHERE id = 1;`);
 
-  return rows[0][0];
+  if(rows.length){
+    return rows[0][0]
+  }else{
+    return false
+  }
 };
 
 export const updateDFiles = async (files: fstructure) => {
-  const table = await getUserTable("userfiles");
-
   const storeFormat = JSON.stringify(files);
 
   const xx = await userTable.write(
-    `UPDATE ${table} SET files = '${storeFormat}' WHERE id = '1'`
+    `UPDATE ${tableName} SET files = '${storeFormat}' WHERE id = '1'`
   );
 
   if (xx) {
@@ -170,9 +211,11 @@ export const deleteFile = async (cid: string) => {
  * **/
 
 export const storeFiles = async (file: store[], dirfolder: string[]) => {
-  const fileData = await readDFiles();
-
-  updateSearch(fileData.files, file, dirfolder);
+  const fileData = await readDFiles(tableName);
+  
+  updateSearch(fileData.files, file, dirfolder, false);
+  
+  console.log(fileData)
 
   await updateDFiles(fileData);
 
@@ -180,7 +223,7 @@ export const storeFiles = async (file: store[], dirfolder: string[]) => {
 };
 
 
-const getFileList = (files: (store | dir)[], dirFolder: string[], num:number = 1) => {
+const getFileList = (files: (store | dir)[], dirFolder: string[], num:number = 0) => {
 
     files.forEach((file: any) => {
       if (file["files"] !== undefined) {
@@ -208,15 +251,16 @@ const getFileList = (files: (store | dir)[], dirFolder: string[], num:number = 1
  * **/
 
 export const retrieveFiles = async (folder?: string[]) => {
-  const fileData = await readDFiles();
 
-  if (folder !== undefined) {
+  const fileData = await readDFiles(tableName);
+
+  if (folder !== undefined && folder.length > 1) {
   
     return getFileList(fileData.files, folder);
 
   } else {
 
-    return fileData;
+    return fileData.files;
 
   }
 };

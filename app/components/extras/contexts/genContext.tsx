@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { store, dir } from "../storage";
 
 interface Upload {
   error?: {
@@ -15,13 +16,21 @@ interface Upload {
   };
 }
 
+interface Files { 
+    fileList?: (dir | store)[]
+    update?: (files: (dir | store)[]) => void
+}
+
 export interface gCon{
-        upload: Upload
+        upload: Upload,
+        files: Files
 }
 
 export const GenContext = createContext<gCon>({
-    upload: {}
+    upload: {},
+    files: {}
 });
+
 
 export const GenProvider = ({children}: {children: JSX.Element}) => {
 
@@ -30,6 +39,8 @@ export const GenProvider = ({children}: {children: JSX.Element}) => {
     const [isUploading, updateUploading] = useState<number>(0);
 
     const [uploadSuccess, updateUploadSuccess] = useState<boolean>(false);
+
+    const [dirFiles, updateFiles] = useState<(dir | store)[]>([]);
 
     return (
       <GenContext.Provider
@@ -48,7 +59,11 @@ export const GenProvider = ({children}: {children: JSX.Element}) => {
               update: (state: number) => updateUploading(state),
             },
           },
-        }}
+          files: {
+            fileList: dirFiles,
+            update: (files:(dir | store)[]) => updateFiles(files)
+        }
+      }}
       >
         {children}
       </GenContext.Provider>

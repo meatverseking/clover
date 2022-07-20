@@ -1,7 +1,10 @@
 import { BsPeople, BsPinAngle } from "react-icons/bs";
 import { getSize } from "../extras/folder";
+import { useContext } from "react";
+import { store, dir } from "../extras/storage";
+import { GenContext } from "../extras/contexts/genContext";
 
-const Folder = ({ color = "#40A9FF", data, pinned = false, shared = false }: { color?: string, data: {
+const FolderDes = ({ color = "#40A9FF", key, data, pinned = false, shared = false }: { color?: string, key: number, data: {
   name: string,
   files: number,
   size: number
@@ -9,11 +12,14 @@ const Folder = ({ color = "#40A9FF", data, pinned = false, shared = false }: { c
 
   const { name, files, size} = data;
 
+  const context = useContext(GenContext);
   
   const mainSize = getSize(size);
 
   return (
-    <div className="flex m-auto flex-col w-[186px] h-[199px] py-4 px-2 justify-between items-center cursor-pointer border-[1px] border-solid border-transparent hover:bg-[#8b8b8b24] hover:border-[#e1e1e1] transition-all delay-700 relative">
+    <div onClick={() => {
+
+    }} className="flex m-auto flex-col w-[186px] h-[199px] py-4 px-2 justify-between items-center cursor-pointer border-[1px] border-solid border-transparent hover:bg-[#8b8b8b24] hover:border-[#e1e1e1] transition-all delay-700 relative">
 
       <div className="absolute right-[30px] flex items-center top-[7px]">
         {pinned && <BsPinAngle size={16} color={color} className="mr-1"/>}
@@ -38,17 +44,17 @@ const Folder = ({ color = "#40A9FF", data, pinned = false, shared = false }: { c
         </svg>
       </div>
 
-      <div className="text-[17px] max-h-[28px] truncate text-center w-full leading-7 font-[500] text-[#000000D9]">
+      <div className="text-[16px] max-h-[28px] truncate text-center w-full leading-7 font-[500] text-[#000000D9]">
         {name}
       </div>
-      <div className="text-[16px] text-center w-full truncate leading-6 font-[400] text-[#00000073]">
+      <div className="text-[16px] text-center w-full truncate leading-6 font-[500] text-[#00000073]">
         {files} item{files > 1 ? "s" : ""}
       </div>
-      <div className="text-[13px] text-center w-full -mt-2 truncate leading-6 font-[400] text-[#00000040]">
+      <div className="text-[14px] text-center w-full -mt-2 truncate leading-6 font-[500] text-[#00000040]">
         {mainSize}
       </div>
     </div>
   );
 }
 
-export default Folder;
+export default FolderDes;

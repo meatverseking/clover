@@ -1,3 +1,4 @@
+import { NFTStorage } from "nft.storage";
 import { Web3Storage } from "web3.storage";
 
 export const makeStorageClient = (token) => {
@@ -6,3 +7,8 @@ export const makeStorageClient = (token) => {
     });
 };
 
+export const makeNFTClient = (token) => {
+    return new NFTStorage({
+        token
+    });
+}
