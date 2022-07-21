@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { RiLogoutCircleLine, RiSettingsLine } from 'react-icons/ri';
 import {
   LinearProgress,
-  Button,Paper, InputBase, IconButton, Popper, Box, Fade, 
+  Button, Paper, InputBase, IconButton, Popper, Box, Fade,
 } from "@mui/material"
 import logo from '../../public/images/logo.png';
 import user from '../../public/images/user.png';
@@ -51,7 +51,7 @@ const Dashboard = () => {
   const { upload } = uploadData;
 
   const { success, error, loading } = upload;
-
+  const [buffer, setBuffer] = useState<number>(0)
   const triggerUpload = (w: React.SyntheticEvent & { target: HTMLInputElement }) => {
     if (w.target.files) {
       uploadFiles(w.target.files);
@@ -61,42 +61,42 @@ const Dashboard = () => {
   const [fileData, setFileData] = useState({});
   const [isLoading, setLoader] = useState(true);
 
-    useEffect(() => {
+  useEffect(() => {
 
-         async function init(){
+    async function init() {
 
-           if (userTable === undefined) {
-             await beginStorageProvider();
-           }
-           
-           const init:any = await createUserTables();
-           
-           const xc:any = await readDFiles(tableName);
-           const dir: any = await retrieveFiles(currentDir);
-           if (init.create === true && xc !== false) {
-             setFileData(xc);
-             if(uploadData.files?.update !== undefined){
-                uploadData.files?.update(dir);
-             }
-             setLoader(false);
-           } else {
-             verifyHash(init.create).then(async (c) => {
-               if (c === true) {
-                 await initDataStorage("Joel George"); //replace Joel George with user name
-                 setFileData(initData);
-                 if(uploadData.files?.update !== undefined){
-                  uploadData.files?.update(dir)
-                 }
-                 setLoader(false);
-               }
-             });
-           }
-         };
-       init();
-        
-    }, [currentDir])
-   
-  
+      if (userTable === undefined) {
+        await beginStorageProvider();
+      }
+
+      const init: any = await createUserTables();
+
+      const xc: any = await readDFiles(tableName);
+      const dir: any = await retrieveFiles(currentDir);
+      if (init.create === true && xc !== false) {
+        setFileData(xc);
+        if (uploadData.files?.update !== undefined) {
+          uploadData.files?.update(dir);
+        }
+        setLoader(false);
+      } else {
+        verifyHash(init.create).then(async (c) => {
+          if (c === true) {
+            await initDataStorage("Joel George"); //replace Joel George with user name
+            setFileData(initData);
+            if (uploadData.files?.update !== undefined) {
+              uploadData.files?.update(dir)
+            }
+            setLoader(false);
+          }
+        });
+      }
+    };
+    init();
+
+  }, [currentDir])
+
+
 
   const uploadFiles = (files: FileList) => {
     let maxSize: number = 0;
@@ -140,7 +140,7 @@ const Dashboard = () => {
 
   const uploadProvider = async (files: File[], totalSize: number) => {
     let index: number = 0;
-    const addFiles:store[] = []
+    const addFiles: store[] = []
 
     const onRootCidReady = async (cid: string) => {
       error?.update("");
@@ -155,23 +155,23 @@ const Dashboard = () => {
         type: files[index].type,
         size: files[index].size,
         extension,
-        cid: [ cid ],
+        cid: [cid],
         file: true,
         tag: 'default',
         deleted: false
       })
 
-      if(index == files.length - 1){
-      
-       const newFileData = await storeFiles(addFiles, currentDir);
-       const dir = await retrieveFiles(currentDir); 
+      if (index == files.length - 1) {
+
+        const newFileData = await storeFiles(addFiles, currentDir);
+        const dir = await retrieveFiles(currentDir);
         setFileData(newFileData)
-        
-        if(uploadData?.files?.update !== undefined){
-      
+
+        if (uploadData?.files?.update !== undefined) {
+
           uploadData?.files?.update(dir);
-        
-      }
+
+        }
 
       }
 
@@ -182,7 +182,7 @@ const Dashboard = () => {
 
     const onStoredChunk = (size: number) => {
       uploaded += size;
-
+      setBuffer(size)
       const pct: number = (uploaded / totalSize) * 100;
 
       console.log(`Uploading... ${pct.toFixed(2)}% complete`);
@@ -479,6 +479,12 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="px-1">
+                {Boolean(loading?.status) && (<Box>
+                  <LinearProgress variant='buffer' sx={{
+                    backgroundColor: '#40A9FF',
+                    color: '#40A9FF'
+                  }} value={loading?.status} valueBuffer={buffer} />
+                </Box>)}
                 <div className="flex items-center justify-between pt-3">
                   <Paper
                     component="form"
@@ -546,7 +552,7 @@ const Dashboard = () => {
                         Drop files here
                       </h2>
                       <span className="mt-2 text-[17px] flex w-full text-center">
-                        or use the `{<FaPlus size={17}/>}` button
+                        or use the `{<FaPlus size={17} />}` button
                       </span>
                     </div>
                   </div>
