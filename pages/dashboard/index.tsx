@@ -398,6 +398,9 @@ const Dashboard = () => {
             }}
             className="w-full st:!pl-0 pb-[65px] transition-all delay-500 h-full flex flex-col"
           >
+            <Box>
+                <ProgressBar />
+            </Box>
             <div className="px-5 h-full">
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center">
