@@ -1,9 +1,22 @@
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function Chats() {
-  const [message, setMessage] = useState();
-  let data = { user: "John", message: message, time: 16274567 };
+  const e = new Date;
+  const f = e.getTime();
+  console.log(f);
+
+  const [message, setMessage] = useState('');
+  function Send() {
+    let data = { user: "John", message: message, time: Math.floor(f / 1000) };
+    
+    data = JSON.stringify(data)
+
+  }
+
+  useEffect(() => {
+    // console.log(data)
+  });
 
   if (typeof window !== 'undefined') {
     const toggleButton = document.querySelector(".dark-light");
@@ -161,6 +174,11 @@ function Chats() {
             <input type="text" placeholder="Type a message..." value={message} onChange={(e) => {
               setMessage(e.target.value);
             }} />
+            <button onClick={() => {
+              
+            }}>
+              Send
+            </button>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="feather feather-thumbs-up">
               <path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" />
             </svg>

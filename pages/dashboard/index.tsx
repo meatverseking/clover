@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { RiLogoutCircleLine, RiSettingsLine } from 'react-icons/ri';
 import {
   LinearProgress,
-  Button, Paper, InputBase, IconButton, Popper, Box, Fade,
+  Button, Paper, InputBase, IconButton, Popper, Box, Fade
 } from "@mui/material"
 import logo from '../../public/images/logo.png';
 import user from '../../public/images/user.png';
@@ -399,7 +399,7 @@ const Dashboard = () => {
             className="w-full st:!pl-0 pb-[65px] transition-all delay-500 h-full flex flex-col"
           >
             <Box>
-                <ProgressBar />
+              <LinearProgress />
             </Box>
             <div className="px-5 h-full">
               <div className="flex justify-between items-center py-4">
