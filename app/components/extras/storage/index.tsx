@@ -84,7 +84,6 @@ export const beginStorageProvider = async () => {
 
     tableName = await getUserTable('userfiles');
 
-    console.log(tableName)
 
 }
 
@@ -111,7 +110,8 @@ export const getUserTable = async (table_name?:string) => {
 
 }
 
-export const verifyHash = async (hash: any) => {
+export const verifyHash = async (hash: string) => {
+   
         const receiptRes = await userTable.receipt(
               hash
         );
@@ -155,6 +155,7 @@ export const initDataStorage = async (username: string) => {
       const read = await readDFiles(tableName);
       if(!read){
       const store = JSON.stringify(initData);
+      
       const { hash } = await userTable.write(
         `INSERT INTO ${tableName} (id, name, files) VALUES (1, '${username}', '${store}');`
       );
@@ -222,8 +223,7 @@ export const storeFiles = async (file: store[], dirfolder: string[]) => {
   const fileData = await readDFiles(tableName);
   
   updateSearch(fileData.files, file, dirfolder, false);
-  
-  console.log(fileData)
+
 
   await updateDFiles(fileData);
 

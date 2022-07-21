@@ -73,13 +73,14 @@ const Dashboard = () => {
 
       const xc: any = await readDFiles(tableName);
       const dir: any = await retrieveFiles(currentDir);
-      if (init.create === true && xc !== false) {
+      if (init.create == true && xc !== false) {
         setFileData(xc);
         if (uploadData.files?.update !== undefined) {
           uploadData.files?.update(dir);
         }
         setLoader(false);
-      } else {
+      } else if(xc == false && init.create != true){
+        
         verifyHash(init.create).then(async (c) => {
           if (c === true) {
             await initDataStorage("Joel George"); //replace Joel George with user name
@@ -90,6 +91,13 @@ const Dashboard = () => {
             setLoader(false);
           }
         });
+      }else{
+         await initDataStorage("Joel George"); //replace Joel George with user name
+            setFileData(initData);
+            if (uploadData.files?.update !== undefined) {
+              uploadData.files?.update(dir)
+            }
+            setLoader(false);
       }
     };
     init();
