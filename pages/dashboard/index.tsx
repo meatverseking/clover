@@ -94,7 +94,7 @@ const Dashboard = () => {
     };
     init();
 
-  }, [currentDir])
+  }, [currentDir, uploadData.files])
 
 
 
@@ -398,9 +398,21 @@ const Dashboard = () => {
             }}
             className="w-full st:!pl-0 pb-[65px] transition-all delay-500 h-full flex flex-col"
           >
-            <Box>
-                <ProgressBar />
-            </Box>
+            {Boolean(loading?.status) && (
+              <Box>
+                <LinearProgress
+                  variant="buffer"
+                  sx={{
+                    backgroundColor: "#40A9FF",
+                    color: "#40A9FF",
+                    height: 5,
+                    width: "100%",
+                  }}
+                  value={loading?.status}
+                  valueBuffer={buffer}
+                />
+              </Box>
+            )}
             <div className="px-5 h-full">
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center">
@@ -479,12 +491,6 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="px-1">
-                {Boolean(loading?.status) && (<Box>
-                  <LinearProgress variant='buffer' sx={{
-                    backgroundColor: '#40A9FF',
-                    color: '#40A9FF'
-                  }} value={loading?.status} valueBuffer={buffer} />
-                </Box>)}
                 <div className="flex items-center justify-between pt-3">
                   <Paper
                     component="form"
@@ -574,6 +580,7 @@ const Dashboard = () => {
                             data={{
                               name: e["name"],
                               size: e["size"],
+                              key: i,
                             }}
                             text={e["extension"]}
                           />
@@ -591,6 +598,7 @@ const Dashboard = () => {
                             data={{
                               name: e["name"],
                               size,
+                              key: i,
                               files: e["files"].lenth,
                             }}
                           />

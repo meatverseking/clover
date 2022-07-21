@@ -24,5 +24,4 @@ contract SimpleNFT is ERC721URIStorage{
                 tokenCounter.increment();
                 return newItemId;
          } 
-
 }

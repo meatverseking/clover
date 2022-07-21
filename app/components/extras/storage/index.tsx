@@ -64,7 +64,15 @@ const updateSearch = (files: (store | dir)[], newFiles: store[], fileFolder: str
   }
 }
 
-
+export const toDataUrl = (blob: Blob) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      })
+  
+}
 
 export let userTable:Connection;
 export let tableName:any = '';

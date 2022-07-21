@@ -18,7 +18,11 @@ interface Upload {
 
 interface Files { 
     fileList?: (dir | store)[]
-    update?: (files: (dir | store)[]) => void
+    update?: (files: (dir | store)[]) => void,
+    directory?: {
+        value: boolean,
+        update: (state: boolean) => void
+    }
 }
 
 export interface gCon{
@@ -35,7 +39,7 @@ export const GenContext = createContext<gCon>({
 export const GenProvider = ({children}: {children: JSX.Element}) => {
 
     const [uploadError, updateError] = useState<string>('');
-
+    const [ndirectory, updateDirectory] = useState<boolean>(false)
     const [isUploading, updateUploading] = useState<number>(0);
 
     const [uploadSuccess, updateUploadSuccess] = useState<boolean>(false);
@@ -61,7 +65,11 @@ export const GenProvider = ({children}: {children: JSX.Element}) => {
           },
           files: {
             fileList: dirFiles,
-            update: (files:(dir | store)[]) => updateFiles(files)
+            update: (files:(dir | store)[]) => updateFiles(files),
+            directory: {
+                value: ndirectory,
+                update: (state: boolean) => updateDirectory(state)
+            }
         }
       }}
       >

@@ -4,21 +4,24 @@ import { useContext } from "react";
 import { store, dir } from "../extras/storage";
 import { GenContext } from "../extras/contexts/genContext";
 
-const FolderDes = ({ color = "#40A9FF", key, data, pinned = false, shared = false }: { color?: string, key: number, data: {
+const FolderDes = ({ color = "#40A9FF", data, pinned = false, shared = false }: { color?: string, data: {
   name: string,
+  key: number,
   files: number,
   size: number
 }, pinned ?: boolean, shared ?: boolean }) => {
 
-  const { name, files, size} = data;
+  const { name, files, size, key} = data;
 
   const context = useContext(GenContext);
   
+  const directory = context.files.directory;
+
   const mainSize = getSize(size);
 
   return (
     <div onClick={() => {
-
+       
     }} className="flex m-auto flex-col w-[186px] h-[199px] py-4 px-2 justify-between items-center cursor-pointer border-[1px] border-solid border-transparent hover:bg-[#8b8b8b24] hover:border-[#e1e1e1] transition-all delay-700 relative">
 
       <div className="absolute right-[30px] flex items-center top-[7px]">

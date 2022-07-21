@@ -6,12 +6,10 @@ import { store, dir } from "../extras/storage";
 const FileDes = ({
   color = { main: "#b3b3b3", text: "#808080", light: "#ececec" },
   data,
-  key,
   text,
   pinned = false,
   shared = false,
 }: {
-  key: number
   color?: {
     main: string;
     text: string;
@@ -20,12 +18,13 @@ const FileDes = ({
   text: string;
   data: {
     name: string;
+    key: number;
     size: number;
   };
   pinned?: boolean;
   shared?: boolean;
 }) => {
-  const { name, size } = data;
+  const { name, size, key } = data;
 
   const mainSize = getSize(size);
 
