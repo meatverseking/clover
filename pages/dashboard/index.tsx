@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { RiLogoutCircleLine, RiSettingsLine } from 'react-icons/ri';
 import {
   LinearProgress,
-  Button, Paper, InputBase, IconButton, Popper, Box, Fade,
+  Button, Paper, InputBase, IconButton, Popper, Box, Fade
 } from "@mui/material"
 import logo from '../../public/images/logo.png';
 import user from '../../public/images/user.png';
