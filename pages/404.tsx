@@ -42,21 +42,32 @@ const [e404, set404] = useState(false);
           let mainBlob: Blob;
           if (filex.cid.length > 1) {
             filex.cid.forEach(async (data: string, i: number) => {
+            try{
               const response = await fetch(
                 `https://${data}.ipfs.dweb.link/${filex.name}`
               );
 
               const blob = await response.blob();
               blobparts.push(blob);
+            }catch(err) {
+                setError(true)
+                return;
+            }
             });
             mainBlob = new Blob(blobparts, { type: filex.type });
+      
           } else {
-            const response = await fetch(
+            try{const response = await fetch(
               `https://${filex.cid[0]}.ipfs.dweb.link/${filex.name}`
             );
 
             const blob = await response.blob();
+            
             mainBlob = blob;
+        }catch(xx) {
+            setError(true)
+            return;
+        }
           }
 
           const maa = filex.type.split("/");
@@ -74,7 +85,7 @@ const [e404, set404] = useState(false);
             const a = document.createElement("a");
             a.style.display = "none";
             a.href = linkk;
-            a.download = filex.name + "." + filex.extension;
+            a.download = filex.name;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(linkk);
