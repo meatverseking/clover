@@ -8,15 +8,30 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract SimpleNFT is ERC721URIStorage{
          using Counters for Counters.Counter;
          Counters.Counter private tokenCounter;
-
-
-         constructor() ERC721("Clover FS", "CFS") { }
+         uint totalSupply = 1000;
+         address owner;
+         constructor() ERC721("Clover FS", "CFS") { 
+            owner = msg.sender;
+         }
 
          function totalMinted() public view returns (uint256){
              return tokenCounter.current();
          }
 
-        function mintTokens(address forUser, string memory tokenURI) public returns(uint256) {
+         modifier onlyOwner{
+            require(msg.sender != owner, 'Only owner');
+            _;
+         }
+
+        
+        function addSupply(uint256 add) public onlyOwner {
+            totalSupply = totalSupply + add;
+         }
+
+        function mintTokens(address forUser, string memory tokenURI) public onlyOwner returns(uint256) {
+
+                require(totalSupply >= tokenCounter.current(), 'Total Limit Reached');
+
                 uint256 newItemId = tokenCounter.current();
                 _mint(forUser, newItemId);
                 _setTokenURI(newItemId, tokenURI);

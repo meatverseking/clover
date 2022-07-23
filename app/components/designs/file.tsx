@@ -42,20 +42,32 @@ const FileDes = ({
 
 
   return (
-    <div onClick={() => {
-        if(context.files?.fileList !== undefined){
-            const filex = context.files?.fileList[key];
-        if(filex.file === true){
-            let lnk:string = '';
-            if(filex.links === undefined){
-                lnk = `/${key}/${filex.name}`;
-            }else{
-                lnk = filex.links[0];
-            }   
-            openNew(lnk)         
+    <div
+      onDoubleClick={() => {
+        if (context.files?.fileList !== undefined) {
+          const filex = context.files?.fileList[key];
+          if (filex.file === true) {
+            let lnk: string = "";
+            if (filex.links === undefined) {
+              lnk = `/${key}/${filex.name}`;
+            } else {
+              lnk = filex.links[0];
+            }
+            openNew(lnk);
+          }
         }
-     }
-    }} className="flex m-auto flex-col w-[186px] h-[199px] py-4 px-2 justify-between items-center cursor-pointer border-[1px] border-solid border-transparent hover:bg-[#8b8b8b24] hover:border-[#e1e1e1] transition-all delay-700 relative">
+      }}
+      onClick={(e) => {
+        const parent:HTMLElement | null = e.currentTarget.parentElement;
+        const elems:any = parent?.querySelector('.file') as HTMLDivElement;
+   
+        elems.style.backgroundColor = 'xxx'
+    
+        e.currentTarget.style.backgroundColor = '#8b8b8b24'
+                
+      }}
+      className="flex file m-auto flex-col w-[186px] h-[199px] py-4 px-2 justify-between items-center cursor-pointer border-[1px] border-solid border-transparent hover:bg-[#8b8b8b24] hover:border-[#e1e1e1] transition-all delay-700 relative"
+    >
       <div className="absolute right-[30px] flex items-center top-[7px]">
         {pinned && (
           <BsPinAngle size={16} color={color["main"]} className="mr-1" />

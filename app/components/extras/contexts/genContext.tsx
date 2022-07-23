@@ -16,6 +16,13 @@ interface Upload {
   };
 }
 
+interface Login {
+    name?: string,
+    contract?: string,
+    data?: object,
+    update?: (state: [string, string, object]) => void
+}
+
 interface Files { 
     fileList?: (dir | store)[]
     update?: (files: (dir | store)[]) => void,
@@ -27,12 +34,14 @@ interface Files {
 
 export interface gCon{
         upload: Upload,
-        files: Files
+        files: Files,
+        login: Login
 }
 
 export const GenContext = createContext<gCon>({
     upload: {},
-    files: {}
+    files: {},
+    login: {}
 });
 
 
@@ -45,6 +54,8 @@ export const GenProvider = ({children}: {children: JSX.Element}) => {
     const [uploadSuccess, updateUploadSuccess] = useState<boolean>(false);
 
     const [dirFiles, updateFiles] = useState<(dir | store)[]>([]);
+
+    const [log, updLog] = useState<[string, string, object]>(['','', {}]);
 
     return (
       <GenContext.Provider
@@ -70,7 +81,13 @@ export const GenProvider = ({children}: {children: JSX.Element}) => {
                 value: ndirectory,
                 update: (state: boolean) => updateDirectory(state)
             }
-        }
+        },
+        login: {
+          name: log[0],
+          contract: log[1],
+          data: log[2],
+          update: (state: [string, string, object]) => updLog(state)
+        } 
       }}
       >
         {children}

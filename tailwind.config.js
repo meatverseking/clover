@@ -16,6 +16,9 @@ module.exports = {
     screens: {
       "st": { max: "750px" },
       "md": { max: "427px" },
+      "2usm": { max: "505px" },
+      "2sm": { max: "975px" },
+      usm: { max: "940px" },
     },
     extend: {},
   },
