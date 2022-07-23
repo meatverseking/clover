@@ -18,8 +18,7 @@ import { GenContext } from '../app/components/extras/contexts/genContext';
 const contractAddress = "0xf4744dA5fc8fb62689B23beAc572633Aed1280A3";
 const abi:any = contract.abi;
 
-const web3 = createAlchemyWeb3(API_URL || "");
-const nftContract = new web3.eth.Contract(abi, contractAddress);
+
 
 
 const Home: NextPage = () => {
@@ -75,12 +74,18 @@ const Home: NextPage = () => {
   };
 
   const [name, setName] = useState<string>('');
+  const [des, setDes] = useState<string>('');
   const [contractAd, setContractAd] = useState<string>('');
   const [participants, setParticipants] = useState<string[]>([]);
   const [bigLoader, setBigLoader] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
+
+  const useClose = () => setShowModal(false)
+
+
   let nft:any = "";
 
-  const generateNftData = async (name: string, owner: string) => {
+  const generateNftData = async (name: string, owner: string, desc?: string) => {
 
     const nfx = makeNFTClient(
       await Moralis.Cloud.run("getNFTStorageKey")
@@ -96,7 +101,7 @@ const Home: NextPage = () => {
           type: "image/png",
         }),
         name,
-        description: `Access to ${name} ${(name).toLowerCase().indexOf('dao') == -1 ? 'DAO' : ''}`,
+        description: `${desc === undefined ? `Access to ${name} ${(name).toLowerCase().indexOf('dao') == -1 ? 'DAO' : ''}` : desc}`,
         attributes: [
           {
             main: owner,
@@ -111,6 +116,10 @@ const Home: NextPage = () => {
 
 
   const mintNFT = async (tokenURI: string, receiver: string) => {
+
+    const web3 = createAlchemyWeb3(API_URL || "");
+    const nftContract = new web3.eth.Contract(abi, contractAddress);
+
     const nonce = await web3.eth.getTransactionCount(
       process.env.PUBLIC_KEY || "",
       "latest"
@@ -165,6 +174,12 @@ const Home: NextPage = () => {
       if (!name.length) {
         setFailMessage("Name is required"); 
         setLoading(false);         
+        return;
+      }
+
+      if(des.length > 300){
+        setFailMessage("Description requires a max of 300 characters");
+        setLoading(false);
         return;
       }
 
@@ -227,6 +242,7 @@ const Home: NextPage = () => {
         dao.set("user", user);
         dao.set("contract", contractAd);
         dao.set("participants", JSON.stringify(participants));
+        dao.set("desc", des.length ? des : undefined);
         dao.set("userContract", user?.get("ethAddress"));
         dao.set("name", name);
 
@@ -235,7 +251,7 @@ const Home: NextPage = () => {
 
           if(contractAd == 'default'){
             nftown.push(user?.get('ethAddress'))
-            const metadata = await generateNftData(name, user?.get('ethAddress'));
+            const metadata = await generateNftData(name, user?.get('ethAddress'), des.length ? des : undefined);
             
             nftown.forEach(async (address:string, i:number) => {
 
@@ -243,14 +259,13 @@ const Home: NextPage = () => {
 
             })
             if (loginData?.update !== undefined) {
-              loginData?.update([name, contractAd, { participants: nftown }]);
+              loginData?.update([name, contractAd, { participants: nftown, owner: user?.get("ethAddress") }]);
             }
           }else{
             if(loginData?.update !== undefined){
-            loginData?.update([name, contractAd, {}]);
+            loginData?.update([name, contractAd, {owner: user?.get("ethAddress")}]);
           }
         }
-
 
           window.location.href = '/dashboard';
 
@@ -269,7 +284,7 @@ const Home: NextPage = () => {
   }
 
 
-  
+  let exec:object[] = [];
   const login = async () => {
     setLoginError('');
     setBigLoader(true)
@@ -286,27 +301,88 @@ const Home: NextPage = () => {
              const main = res.data.data.items;
 
              if(!res.data.error){
-                let exec = [];
+                
                 main.forEach(async (v:any) => {
                   
                   const clx = ''
                 
-                  if (contractAddress == ((v.contract_address).toLowerCase()).trim()) {
-                      
-                  }
-                  const DAO = Moralis.Object.extend('DAOs');
+                  const DAO = Moralis.Object.extend("DAOs");
 
                   const mQ = new Moralis.Query(DAO);
-
                   mQ.equalTo("contract", v.contract_address);
 
-                  const ld = await mQ.find();
+                  if (contractAddress == ((v.contract_address).toLowerCase()).trim()) {
 
-                  if(ld.length){
+                    v.nft_data.forEach(async (vv: any) => {
+                      
+                      
+                    mQ.equalTo("name", vv.name);
+                  
+                    
+                  if(vv.attributes[0].main !== undefined){
 
+                      mQ.equalTo("contractAddress", vv.attributes[0].main);
+
+                      const ld = await mQ.find();
+
+                    if (ld.length) {
+                      exec.push({
+                        name: vv.name,
+                        description: vv.description,
+                        image: vv.image,
+                        main: vv.attributes[0].main,
+                      });
+                    }
+                  }
+                });
+                  }else{
+                    const ld = await mQ.find();
+
+                    if(ld.length){
+
+                      ld.forEach((vv:any) => {
+
+                          exec.push({
+                            name: vv.name,
+                            description:
+                              vv.desc !== undefined
+                                ? vv.desc
+                                : `Access to ${vv.name} ${
+                                    vv.name.toLowerCase().indexOf("dao") == -1
+                                      ? "DAO"
+                                      : ""
+                                  }`,
+                            image: vv.logo_url,
+                            main: vv.userContract
+                          });
+                      })
+                    }
+                  }
+                })
+
+                if (exec.length) {
+                  if(exec.length > 1){
+                  setShowModal(true);
+                  }else{
+                    const vv:any = exec[0];
+                     if (loginData?.update !== undefined) {
+                       loginData?.update([
+                         vv.name,
+                         vv.contract,
+                         {
+                           main: vv.owner,
+                         },
+                       ]);
+                       window.location.href = "/dashboard";
+                     }
                   }
 
-                })
+                } else {
+                  setBigLoader(false);
+                  setSupport(false);
+                  setLoginError("No registered DAO found");
+                }    
+
 
              }else{
                 setBigLoader(false);
@@ -330,6 +406,8 @@ const Home: NextPage = () => {
     }
   };
 
+
+
   return (
     <>
       {bigLoader && <Loader />}
@@ -341,6 +419,76 @@ const Home: NextPage = () => {
             <meta name="description" content="Chat as a DAO" />
             <link rel="icon" href="/favicon.ico" />
           </Head>
+
+          {showModal ? (
+            <div className="justify-center bg-[rgba(255,255,255,.4)] items-center flex overflow-x-hidden overflow-y-auto backdrop-blur fixed inset-0 z-50 outline-none focus:outline-none">
+              <div className="relative max-w-[1200px] mmd:w-[70%] 4sm:w-[60%] w-[340px] min-w-[340px]">
+                {/*content*/}
+                <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                  <div className="flex items-center justify-center pb-2 pt-3 border-solid rounded-t">
+                    <h2
+                      style={{ fontFamily: "inherit" }}
+                      className="text-[18px] font-bold"
+                    >
+                      Choose DAO
+                    </h2>
+                  </div>
+                  {/*body*/}
+                  {/* {Boolean(authError?.length) && (
+                    <div className="transition-all rounded-md delay-500 border-[#1891fe] text-[#1891fe] items-center font-bold text-[16px] border-[1px] mx-6 my-2 w-[calc(100%-48px)] p-3">
+                      {authError}
+                    </div>
+                  )} */}
+
+                  <div className="relative p-6 flex flex-col justify-center 4sm:flex-row">
+                    
+                    {exec.map((vv: any, i: number) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                             if (loginData?.update !== undefined) {
+                               loginData?.update([
+                                 vv.name,
+                                 vv.contract,
+                                 {
+                                   main: vv.owner,
+                                 },
+                               ]);
+                               window.location.href = '/dashboard';
+                             }
+                        }}
+                        style={{ fontFamily: "inherit" }}
+                        className="transition-all rounded-md delay-500 hover:border-[#1891fe] hover:text-[#1891fe] items-start text-[16px] flex justify-between border-[1px] 4sm:mr-2 text-[#575757] mb-2 w-full py-4 px-4"
+                      >
+                        <div className="flex flex-col items-start">
+                          <span className="font-bold">{vv.name}</span>
+                          <span className="text-left">
+                            {vv.desc}
+                          </span>
+                        </div>
+                        <Image
+                          src={vv.image}
+                          alt={vv.name}
+                          width={40}
+                          height={40}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  {/*footer*/}
+                  <div className="flex items-center justify-end p-2 border-t border-solid border-slate-200 rounded-b">
+                    <button
+                      className="text-blue-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                      type="button"
+                      onClick={useClose}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           <Modal open={open} onClose={handleClose}>
             <div className="w-screen absolute h-screen flex items-center bg-[#ffffffb0]">
@@ -389,6 +537,25 @@ const Home: NextPage = () => {
                               >
                             ) => {
                               setName(e.target.value);
+                            }}
+                          />
+                        </div>
+                        <div className="mt-3">
+                          <TextField
+                            fullWidth
+                            id="outlined-basic"
+                            label="Description of DAO"
+                            variant="outlined"
+                            helperText="Short Description Of DAO, Can be left empty - max 300 characters"
+                            value={des}
+                            onChange={(
+                              e: React.ChangeEvent<
+                                HTMLInputElement | HTMLTextAreaElement
+                              >
+                            ) => {
+                              const val = e.target.value;
+
+                              setDes(val.substring(0, 300));
                             }}
                           />
                         </div>

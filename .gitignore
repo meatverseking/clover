@@ -42,10 +42,6 @@ coverage.json
 typechain
 typechain-types
 
-#Hardhat files
-cache
-artifacts
-
 
 node_modules
 .env
@@ -53,8 +49,4 @@ coverage
 coverage.json
 typechain
 typechain-types
-
-#Hardhat files
-cache
-artifacts
 
