@@ -2,6 +2,7 @@ import axios from 'axios';
 import Moralis from 'moralis'
 import { connect, Connection, SUPPORTED_CHAINS } from "@tableland/sdk";
 
+
 export type store = {
     name: string,
     date?: string | number,
@@ -125,13 +126,14 @@ export const verifyHash = async (hash: string) => {
   }
 
 // initializes the user account
-export const createUserTables = async () => {
+export const createUserTables = async (table: string) => {
 
       if(!tableName.length){
         const { txnHash } = await userTable.create(
           `files text, name text, id int, primary key (id)`, 
-          `userfiles` 
+          `${table}` 
         );
+        console.log('here here')
 
         return {create: txnHash};
 

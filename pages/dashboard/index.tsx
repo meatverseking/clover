@@ -83,7 +83,7 @@ const Dashboard = () => {
     if(user?.get('ethAddress') == main){
       console.log('here')
       const mainNm = loginData[0]; 
-      const init: any = await createUserTables();
+      const init: any = await createUserTables(mainNm);
       const xc: any = await readDFiles(tableName);
       const dir: any = await retrieveFiles(currentDir);
       if (init.create == true && xc !== false) {
