@@ -12,6 +12,7 @@ import Loader from '../app/components/loader';
 const API_URL = process.env.MATIC_LINK;
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 
+
 import contract from "../artifacts/contracts/share.sol/simpleNFT.json";
 import { makeNFTClient } from '../app/components/extras/storage/utoken';
 import { GenContext } from '../app/components/extras/contexts/genContext';
@@ -36,12 +37,14 @@ const Home: NextPage = () => {
 
   const [isNotSupported, setSupport] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string>('');
-  const [open, setOpen] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
   const handleClose = () => setOpen(false);
   const [failMessage, setFailMessage] = useState<string>('');
   const userData = useContext(GenContext);
   const { login: loginData } = userData;
+  const [userAddress, setUserAddress] = useState<string>('');
+  
   useEffect(() => {
     if (!isWeb3Enabled) {
       enableWeb3();
@@ -49,7 +52,9 @@ const Home: NextPage = () => {
 
     if (isAuthenticated) {
 
-      console.log("Logged in user:", user!.get("ethAddress"));
+      setUserAddress(user!.get("ethAddress"));
+
+      console.log("Logged in user:", userAddress);
 
       if (isNotSupported) {
         logout();
@@ -77,6 +82,7 @@ const Home: NextPage = () => {
   const [des, setDes] = useState<string>('');
   const [contractAd, setContractAd] = useState<string>('');
   const [participants, setParticipants] = useState<string[]>([]);
+  const [part, setPart] = useState<string>("");
   const [bigLoader, setBigLoader] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -119,45 +125,37 @@ const Home: NextPage = () => {
 
     const web3 = createAlchemyWeb3(API_URL || "");
     const nftContract = new web3.eth.Contract(abi, contractAddress);
+    console.log(receiver);
+    try{
 
     const nonce = await web3.eth.getTransactionCount(
       process.env.PUBLIC_KEY || "",
       "latest"
     ); //get latest nonce
-
     //the transaction
     const tx = {
       from: process.env.PUBLIC_KEY,
       to: contractAddress,
-      nonce: nonce,
+      nonce,
       gas: 500000,
       data: nftContract.methods.mintTokens(receiver, tokenURI).encodeABI(),
     };
 
-    const signPromise = web3.eth.accounts.signTransaction(
+    const signPromise = await web3.eth.accounts.signTransaction(
       tx,
       process.env.MATIC_PRIVATE_KEY || ""
     );
-    signPromise
-      .then((signedTx) => {
-        web3.eth
-          .sendSignedTransaction(signedTx.rawTransaction || "")
-          .then((e) => {
 
-              
+   const receipt = await web3.eth.sendSignedTransaction(signPromise.rawTransaction || "")
 
-          })
-          .catch((ee) => {
-            setLoading(false);
-            setFailMessage(
-              "Your contract address does not exist in your wallet"
-            );
-          });
-      })
-      .catch((err) => {
-        setLoading(false);
-        setFailMessage("Your contract address does not exist in your wallet");
-      });
+   return 'continue';
+
+    }catch(err){
+
+      console.log(err)
+
+    }
+  
   };
 
 
@@ -165,6 +163,9 @@ const Home: NextPage = () => {
       setLoading(true)
       let send: boolean = false;
     authenticate({signingMessage: "Registering A DAO"}).then(async (userx) => {      
+
+      const userAddress = userx?.attributes.ethAddress;
+
        if (!(supported.includes(chainId ? Number(chainId) : 80001))) {
           setSupport(true);  
           setFailMessage("Only Polygon Mumbai testnet is allowed for now")
@@ -209,11 +210,10 @@ const Home: NextPage = () => {
 
       }
         send = true;
+        console.log('default herex')
       }else{
            const res = await axios.get(
-             `https://api.covalenthq.com/v1/80001/address/${userx?.get(
-               "ethAddress"
-             )}/balances_v2/?quote-currency=USD&format=JSON&nft=true&no-nft-fetch=false&key=ckey_d8fd93851d6a4d57bdcf14a337d`
+             `https://api.covalenthq.com/v1/80001/address/${userAddress}/balances_v2/?quote-currency=USD&format=JSON&nft=true&no-nft-fetch=false&key=ckey_d8fd93851d6a4d57bdcf14a337d`
            );
 
            const main = res.data;   
@@ -240,30 +240,38 @@ const Home: NextPage = () => {
 
         const dao = new Dao();
         dao.set("user", user);
-        dao.set("contract", contractAd);
+        dao.set("contract", (contractAd.toLowerCase()).trim() == 'default' ? contractAddress : contractAd);
         dao.set("participants", JSON.stringify(participants));
         dao.set("desc", des.length ? des : undefined);
-        dao.set("userContract", user?.get("ethAddress"));
+        dao.set("userContract", userAddress);
         dao.set("name", name);
 
         try{
           await dao.save();
 
-          if(contractAd == 'default'){
-            nftown.push(user?.get('ethAddress'))
-            const metadata = await generateNftData(name, user?.get('ethAddress'), des.length ? des : undefined);
-            
-            nftown.forEach(async (address:string, i:number) => {
+          if((contractAd.toLowerCase()).trim() == 'default'){
+            nftown.push(userAddress)
+            const metadata = await generateNftData(name, userAddress, des.length ? des : undefined);
 
-              await mintNFT(metadata, address);
 
-            })
+            for(let i = 0; i < nftown.length; i++){
+
+                 const trans = await mintNFT(metadata, nftown[i]);
+                
+                 console.log(trans)
+      
+            }
+
             if (loginData?.update !== undefined) {
-              loginData?.update([name, contractAd, {main: user?.get("ethAddress") }]);
+              loginData?.update([
+                name,
+                contractAddress,
+                { main: userAddress },
+              ]);
             }
           }else{
             if(loginData?.update !== undefined){
-            loginData?.update([name, contractAd, { main: user?.get("ethAddress")}]);
+            loginData?.update([name, contractAd, { main: userAddress}]);
           }
         }
 
@@ -288,77 +296,85 @@ const Home: NextPage = () => {
   const login = async () => {
     setLoginError('');
     setBigLoader(true)
-    if (!isAuthenticated) {
+
       setSupport(false)
       await authenticate({ signingMessage: "Welcome to Clover" })
         .then(async function (user) {
+
+          const userAddress = user?.attributes.ethAddress;
+
           if (supported.includes(chainId ? Number(chainId) : 80001)) {
 
              const res = await axios.get(
-               `https://api.covalenthq.com/v1/80001/address/${user?.get('ethAddress')}/balances_v2/?quote-currency=USD&format=JSON&nft=true&no-nft-fetch=false&key=ckey_d8fd93851d6a4d57bdcf14a337d`
+               `https://api.covalenthq.com/v1/80001/address/${userAddress}/balances_v2/?quote-currency=USD&format=JSON&nft=true&no-nft-fetch=false&key=ckey_d8fd93851d6a4d57bdcf14a337d`
              );
-              
+              console.log(res.data)
              const main = res.data.data.items;
 
              if(!res.data.error){
-                
-                main.forEach(async (v:any) => {
-                
+                for (let i = 0; i < main.length; i++) {
+                  const v:any = main[i];
+
                   const DAO = Moralis.Object.extend("DAOs");
 
                   const mQ = new Moralis.Query(DAO);
                   mQ.equalTo("contract", v.contract_address);
 
-                  if (contractAddress == ((v.contract_address).toLowerCase()).trim()) {
-
-                    v.nft_data.forEach(async (vv: any) => {
+                  if (
+                    contractAddress == v.contract_address.toLowerCase().trim()
+                  ) {
+                    for(let ii = 0; ii < v.nft_data.length; ii++){
+                      const vv = v.nft_data[ii];
                       
-                      
-                    mQ.equalTo("name", vv.name);
-                  
-                    
-                  if(vv.attributes[0].main !== undefined){
+                      mQ.equalTo("name", vv.name);
 
-                      mQ.equalTo("contractAddress", vv.attributes[0].main);
+                      if (vv.attributes[0].main !== undefined) {
+                        mQ.equalTo("contractAddress", vv.attributes[0].main);
 
-                      const ld = await mQ.find();
-                      console.log(ld)
+                        const ld = await mQ.find();
+                        console.log(ld);
+                        if (ld.length) {
+                          exec.push({
+                            name: vv.name,
+                            description: vv.description,
+                            image: vv.image,
+                            main: vv.attributes[0].main,
+                            table:
+                              ld[0].attributes.tablename !== undefined
+                                ? ld[0].attributes.tablename
+                                : undefined,
+                          });
+                        }
+                      }
+                    }
+            
+                  } else {
+                    const ld = await mQ.find();
+
                     if (ld.length) {
-                      exec.push({
-                        name: vv.name,
-                        description: vv.description,
-                        image: vv.image,
-                        main: vv.attributes[0].main,
-                        table: ld[0].attributes.tablename !== undefined ? ld[0].attributes.tablename : undefined
+                      
+                      ld.forEach((vv: any) => {
+                        exec.push({
+                          name: vv.name,
+                          description:
+                            vv.desc !== undefined
+                              ? vv.desc
+                              : `Access to ${vv.name} ${
+                                  vv.name.toLowerCase().indexOf("dao") == -1
+                                    ? "DAO"
+                                    : ""
+                                }`,
+                          image: vv.logo_url,
+                          main: vv.userContract,
+                          table:
+                            vv.tablename !== undefined
+                              ? vv.tablename
+                              : undefined,
+                        });
                       });
                     }
                   }
-                });
-                  }else{
-                    const ld = await mQ.find();
-
-                    if(ld.length){
-
-                      ld.forEach((vv:any) => {
-
-                          exec.push({
-                            name: vv.name,
-                            description:
-                              vv.desc !== undefined
-                                ? vv.desc
-                                : `Access to ${vv.name} ${
-                                    vv.name.toLowerCase().indexOf("dao") == -1
-                                      ? "DAO"
-                                      : ""
-                                  }`,
-                            image: vv.logo_url,
-                            main: vv.userContract,
-                            table: vv.tablename !== undefined ? vv.tablename : undefined
-                          });
-                      })
-                    }
-                  }
-                })
+                }
 
                 if (exec.length) {
                   if(exec.length > 1){
@@ -380,17 +396,15 @@ const Home: NextPage = () => {
                 } else {
                   setBigLoader(false);
                   setSupport(false);
-                  setLoginError("No registered DAO found");
+                  setLoginError("No registered DAOs found");
                 }    
 
 
              }else{
                 setBigLoader(false);
                 setSupport(false);
-                setLoginError("No registered DAO found");
+                setLoginError("No registered DAOs found");
              }
-
-            window.location.href='/dashboard'
 
 
           } else {
@@ -403,7 +417,6 @@ const Home: NextPage = () => {
           setBigLoader(false);
           setLoginError(error);
         });
-    }
   };
 
 
@@ -441,31 +454,29 @@ const Home: NextPage = () => {
                   )} */}
 
                   <div className="relative p-6 flex flex-col justify-center 4sm:flex-row">
-                    
                     {exec.map((vv: any, i: number) => (
                       <button
                         key={i}
                         onClick={() => {
-                             if (loginData?.update !== undefined) {
-                               loginData?.update([
-                                 vv.name,
-                                 vv.contract,
-                                 {
-                                   main: vv.owner,
-                                   table: vv.table === undefined ? undefined : vv.table
-                                 },
-                               ]);
-                               window.location.href = '/dashboard';
-                             }
+                          if (loginData?.update !== undefined) {
+                            loginData?.update([
+                              vv.name,
+                              vv.contract,
+                              {
+                                main: vv.owner,
+                                table:
+                                  vv.table === undefined ? undefined : vv.table,
+                              },
+                            ]);
+                            window.location.href = "/dashboard";
+                          }
                         }}
                         style={{ fontFamily: "inherit" }}
                         className="transition-all rounded-md delay-500 hover:border-[#1891fe] hover:text-[#1891fe] items-start text-[16px] flex justify-between border-[1px] 4sm:mr-2 text-[#575757] mb-2 w-full py-4 px-4"
                       >
                         <div className="flex flex-col items-start">
                           <span className="font-bold">{vv.name}</span>
-                          <span className="text-left">
-                            {vv.desc}
-                          </span>
+                          <span className="text-left">{vv.desc}</span>
                         </div>
                         <Image
                           src={vv.image}
@@ -492,7 +503,7 @@ const Home: NextPage = () => {
           ) : null}
 
           <Modal open={open} onClose={handleClose}>
-            <div className="w-screen absolute h-screen flex items-center bg-[#ffffffb0]">
+            <div className="w-screen overflow-y-scroll overflow-x-hidden absolute h-screen flex items-center bg-[#ffffffb0]">
               <div className="2usm:px-0 mx-auto max-w-[900px] 2usm:w-full relative w-[85%] usm:m-auto min-w-[340px] px-6 my-8 items-center">
                 {isLoading && (
                   <Loader
@@ -508,7 +519,11 @@ const Home: NextPage = () => {
                 <div className="rounded-lg bg-white shadow-lg shadow-[#cccccc]">
                   <div className="border-b flex justify-between py-[14px] px-[17px] text-xl font-bold">
                     Register DAO
-                    <BiX size={16} />
+                    <BiX
+                      size={20}
+                      className="cursor-pointer"
+                      onClick={handleClose}
+                    />
                   </div>
                   <div className="form relative pt-4">
                     <Box sx={{ width: "100%" }}>
@@ -581,7 +596,7 @@ const Home: NextPage = () => {
                         {contractAd.toLowerCase().trim() == "default" && (
                           <>
                             <div className="py-3 font-bold">Participants</div>
-                            <div className="flex w-full items-center">
+                            <div className="flex w-full my-2 cusscroller overflow-hidden overflow-x-scroll items-center">
                               {participants.map((e, i: number) => (
                                 <div
                                   className="border text-[#777] border-solid ml-[2px] rounded p-2"
@@ -597,26 +612,34 @@ const Home: NextPage = () => {
                             <TextField
                               fullWidth
                               id="outlined-basic"
-                              helperText="if left empty only you would have access to your , Polygon mumbai addresses only"
+                              helperText="if left empty only you would have access to your , Polygon testnet addresses only"
                               variant="outlined"
-                              value={""}
+                              value={part}
                               placeholder="click enter to add address"
+                              onChange={(e:any) => {
+                                  setPart(e.target.value)
+                              }}
                               onKeyUp={(e: any) => {
+                                setPart(e.target.value);
+                                
                                 if (e.keyCode == 13 || e.which === 13) {
-                                  if (e.target.value.length) {
-                                    const part: string[] = participants;
-                                    part.push(e.target.value);
+                                  if (part.length) {
+                                    const partx: string[] = participants;
+                                    partx.push(part);
 
-                                    setParticipants(part);
+                                    setParticipants(partx);
+
+                                    setPart("");
                                   }
                                 }
                               }}
                               onBlur={(e: any) => {
-                                if (e.target.value.length) {
-                                  const part: string[] = participants;
-                                  part.push(e.target.value);
-
-                                  setParticipants(part);
+                                setPart(e.target.value);
+                                if (part.length) {
+                                  const partx: string[] = participants;
+                                  partx.push(part);
+                                  setParticipants(partx);
+                                  setPart("");
                                 }
                               }}
                             />
@@ -668,7 +691,7 @@ const Home: NextPage = () => {
               </div>
               <div className="self-center">
                 <Button
-                  onClick={login}
+                  onClick={() => setOpen(true)}
                   style={{
                     fontFamily: "Poppins",
                   }}
