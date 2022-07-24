@@ -84,6 +84,7 @@ export const beginStorageProvider = async (table?: string) => {
 
     if(table !== undefined){
     tableName = await getUserTable(table);
+    console.log(tableName)
     }
 
 }

@@ -16,6 +16,9 @@ function Chats() {
 
   useEffect(() => {
     // console.log(data)
+    
+    
+
   });
 
   if (typeof window !== 'undefined') {
@@ -31,9 +34,9 @@ function Chats() {
       });
     });
 
-    toggleButton.addEventListener("click", () => {
-      document.body.classList.toggle("dark-mode");
-    });
+    // toggleButton.addEventListener("click", () => {
+    //   document.body.classList.toggle("dark-mode");
+    // });
   }
   return (
     <div className="app">

@@ -91,7 +91,7 @@ const Dashboard = () => {
       const xc: any = await readDFiles(tableName);
       const dir: any = await retrieveFiles(currentDir);
 
-      console.log(init, xc, dir)
+
 
       if (init.create == true && xc !== false) {
 
