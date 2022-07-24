@@ -16,7 +16,7 @@ import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import contract from "../artifacts/contracts/share.sol/simpleNFT.json";
 import { makeNFTClient } from '../app/components/extras/storage/utoken';
 import { GenContext } from '../app/components/extras/contexts/genContext';
-const contractAddress = "0xf4744dA5fc8fb62689B23beAc572633Aed1280A3";
+const contractAddress:string = "0xf4744da5fc8fb62689b23beac572633aed1280a3";
 const abi:any = contract.abi;
 
 
@@ -42,7 +42,13 @@ const Home: NextPage = () => {
   const handleClose = () => setOpen(false);
   const [failMessage, setFailMessage] = useState<string>('');
   const userData = useContext(GenContext);
+
+
+
   const { login: loginData } = userData;
+
+  
+
   const [userAddress, setUserAddress] = useState<string>('');
   
   useEffect(() => {
@@ -164,7 +170,7 @@ const Home: NextPage = () => {
       let send: boolean = false;
     authenticate({signingMessage: "Registering A DAO"}).then(async (userx) => {      
 
-      const userAddress = userx?.attributes.ethAddress;
+      const userAddress:string = userx?.attributes.ethAddress;
 
        if (!(supported.includes(chainId ? Number(chainId) : 80001))) {
           setSupport(true);  
@@ -191,6 +197,7 @@ const Home: NextPage = () => {
       }else if(((contractAd).toLowerCase()).trim() == 'default'){
 
       if (participants.length) {
+        
           participants.forEach(async (v) => {
 
             const res = await axios.get(
@@ -205,6 +212,8 @@ const Home: NextPage = () => {
                  `Error Retrieving data from ${v}, check the address and try again`
                );
               return;
+           }else{
+              console.log('works')
            }
          })
 
@@ -239,7 +248,7 @@ const Home: NextPage = () => {
         const Dao = Moralis.Object.extend('DAOs');
 
         const dao = new Dao();
-        dao.set("user", user);
+        dao.set("chat", "[]");
         dao.set("contract", (contractAd.toLowerCase()).trim() == 'default' ? contractAddress : contractAd);
         dao.set("participants", JSON.stringify(participants));
         dao.set("desc", des.length ? des : undefined);
@@ -262,20 +271,24 @@ const Home: NextPage = () => {
       
             }
 
-            if (loginData?.update !== undefined) {
-              loginData?.update([
+            if (loginData.update !== undefined) {
+              
+              loginData.update([
                 name,
                 contractAddress,
                 { main: userAddress },
               ]);
+
+              console.log(loginData, 'here')
             }
           }else{
-            if(loginData?.update !== undefined){
-            loginData?.update([name, contractAd, { main: userAddress}]);
+            if(loginData.update !== undefined){
+            loginData.update([name, contractAd, { main: userAddress}]);
+            console.log(loginData, "hexre");
           }
         }
 
-          window.location.href = '/dashboard';
+        // window.location.href = '/dashboard';
 
         } catch (err) {
             setLoading(false);
@@ -301,7 +314,7 @@ const Home: NextPage = () => {
       await authenticate({ signingMessage: "Welcome to Clover" })
         .then(async function (user) {
 
-          const userAddress = user?.attributes.ethAddress;
+          const userAddress:string = user?.attributes.ethAddress;
 
           if (supported.includes(chainId ? Number(chainId) : 80001)) {
 
@@ -319,24 +332,29 @@ const Home: NextPage = () => {
 
                   const mQ = new Moralis.Query(DAO);
                   mQ.equalTo("contract", v.contract_address);
+                  
 
                   if (
-                    contractAddress == v.contract_address.toLowerCase().trim()
+                    contractAddress == (v.contract_address).toLowerCase().trim()
                   ) {
+
                     for(let ii = 0; ii < v.nft_data.length; ii++){
-                      const vv = v.nft_data[ii];
+                      const vv = v.nft_data[ii].external_data;
                       
                       mQ.equalTo("name", vv.name);
 
                       if (vv.attributes[0].main !== undefined) {
-                        mQ.equalTo("contractAddress", vv.attributes[0].main);
+                        mQ.equalTo("userContract", vv.attributes[0].main);
 
                         const ld = await mQ.find();
-                        console.log(ld);
+                        
+                  
+
                         if (ld.length) {
                           exec.push({
                             name: vv.name,
                             description: vv.description,
+                            contract: contractAddress,
                             image: vv.image,
                             main: vv.attributes[0].main,
                             table:
@@ -355,20 +373,21 @@ const Home: NextPage = () => {
                       
                       ld.forEach((vv: any) => {
                         exec.push({
-                          name: vv.name,
+                          name: vv.attributes.name,
+                          contract: v.contract_address,
                           description:
-                            vv.desc !== undefined
-                              ? vv.desc
-                              : `Access to ${vv.name} ${
-                                  vv.name.toLowerCase().indexOf("dao") == -1
+                            vv.attributes.desc !== undefined
+                              ? vv.attributes.desc
+                              : `Access to ${vv.attributes.name} ${
+                                  vv.attributes.name.toLowerCase().indexOf("dao") == -1
                                     ? "DAO"
                                     : ""
                                 }`,
-                          image: vv.logo_url,
-                          main: vv.userContract,
+                          image: v.logo_url,
+                          main: vv.attributes.userContract,
                           table:
-                            vv.tablename !== undefined
-                              ? vv.tablename
+                            vv.attributes.tablename !== undefined
+                              ? vv.attributes.tablename
                               : undefined,
                         });
                       });
@@ -381,14 +400,19 @@ const Home: NextPage = () => {
                   setShowModal(true);
                   }else{
                     const vv:any = exec[0];
-                     if (loginData?.update !== undefined) {
-                       loginData?.update([
-                         vv.name,
-                         vv.contract,
-                         {
-                           main: vv.owner,
-                         },
+                     if (loginData.update !== undefined) {
+                      const name: string = vv.name;
+                      const contract:string = vv.contract;
+                      const data: { main: string; table?: string } = {
+                        main: vv.main,
+                        table: vv.table !== undefined ? vv.table : undefined,
+                      };
+                       loginData.update([
+                         name,
+                         contract,
+                         data
                        ]);
+
                        window.location.href = "/dashboard";
                      }
                   }
