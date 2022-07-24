@@ -37,6 +37,7 @@ import {
   storeFiles,
   retrieveFiles,
 } from "../../app/components/extras/storage";
+
 import Loader from '../../app/components/loader';
 
 
@@ -83,9 +84,8 @@ const Dashboard = () => {
       }
     
     if(user?.get('ethAddress') == main){
-      console.log('here')
+      
       const mainNm = (loginData[0]).trim(); 
-      console.log(mainNm)
       const init: any = await createUserTables(mainNm);
       
       const xc: any = await readDFiles(tableName);
@@ -106,8 +106,17 @@ const Dashboard = () => {
         if (user?.get("ethAddress") == main) {
           const initTableLX = Moralis.Object.extend("DAOs");
           const initDataTable = new initTableLX();
-          initDataTable.set("tablename", tableName);
-          await initDataTable.save();
+
+          const mQ = new Moralis.Query(initTableLX);
+
+          mQ.equalTo("contractAddress", main);
+          mQ.equalTo("contract", loginData[1]);
+          mQ.equalTo("name", loginData[0]);
+
+          const ee = await mQ.find();
+
+          ee[0].set("tablename", tableName);
+          await ee[0].save();
         }
 
         verifyHash(init.create).then(async (c) => {
@@ -151,7 +160,7 @@ const Dashboard = () => {
     init();
     }
 
-  }, [main,currentDir,user, uploadData.files, Moralis.Object, loginData])
+  }, [main,currentDir,user, uploadData.files, Moralis.Object, Moralis.Query,loginData])
 
 
 
