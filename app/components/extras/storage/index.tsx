@@ -1,7 +1,6 @@
 import axios from 'axios';
-const Moralis = require('moralis')
+import Moralis from 'moralis'
 import { connect, Connection, SUPPORTED_CHAINS } from "@tableland/sdk";
-
 
 export type store = {
     name: string,
@@ -79,11 +78,12 @@ export let tableName:any = '';
 let tables: any[] = [];
 
 //main init
-export const beginStorageProvider = async () => {
+export const beginStorageProvider = async (table?: string) => {
     userTable = await connect(SUPPORTED_CHAINS['polygon-mumbai']);
 
-    tableName = await getUserTable('userfiles');
-
+    if(table !== undefined){
+    tableName = await getUserTable(table);
+    }
 
 }
 
@@ -154,6 +154,7 @@ export const initDataStorage = async (username: string) => {
 
       const read = await readDFiles(tableName);
       if(!read){
+
       const store = JSON.stringify(initData);
       
       const { hash } = await userTable.write(
@@ -258,9 +259,9 @@ const getFileList = (files: (store | dir)[], dirFolder: string[], num:number = 0
  * eg - main.folder.folder
  * **/
 
-export const retrieveFiles = async (folder?: string[]) => {
+export const retrieveFiles = async (folder?: string[], table?: string) => {
 
-  const fileData = await readDFiles(tableName);
+  const fileData = table === undefined ? await readDFiles(tableName) : await readDFiles(table);
 
   if (folder !== undefined && folder.length > 1) {
   

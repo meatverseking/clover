@@ -259,11 +259,11 @@ const Home: NextPage = () => {
 
             })
             if (loginData?.update !== undefined) {
-              loginData?.update([name, contractAd, { participants: nftown, owner: user?.get("ethAddress") }]);
+              loginData?.update([name, contractAd, {main: user?.get("ethAddress") }]);
             }
           }else{
             if(loginData?.update !== undefined){
-            loginData?.update([name, contractAd, {owner: user?.get("ethAddress")}]);
+            loginData?.update([name, contractAd, { main: user?.get("ethAddress")}]);
           }
         }
 
@@ -303,8 +303,6 @@ const Home: NextPage = () => {
              if(!res.data.error){
                 
                 main.forEach(async (v:any) => {
-                  
-                  const clx = ''
                 
                   const DAO = Moralis.Object.extend("DAOs");
 
@@ -324,13 +322,14 @@ const Home: NextPage = () => {
                       mQ.equalTo("contractAddress", vv.attributes[0].main);
 
                       const ld = await mQ.find();
-
+                      console.log(ld)
                     if (ld.length) {
                       exec.push({
                         name: vv.name,
                         description: vv.description,
                         image: vv.image,
                         main: vv.attributes[0].main,
+                        table: ld[0].attributes.tablename !== undefined ? ld[0].attributes.tablename : undefined
                       });
                     }
                   }
@@ -353,7 +352,8 @@ const Home: NextPage = () => {
                                       : ""
                                   }`,
                             image: vv.logo_url,
-                            main: vv.userContract
+                            main: vv.userContract,
+                            table: vv.tablename !== undefined ? vv.tablename : undefined
                           });
                       })
                     }
@@ -452,6 +452,7 @@ const Home: NextPage = () => {
                                  vv.contract,
                                  {
                                    main: vv.owner,
+                                   table: vv.table === undefined ? undefined : vv.table
                                  },
                                ]);
                                window.location.href = '/dashboard';

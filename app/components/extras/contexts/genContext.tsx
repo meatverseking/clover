@@ -19,8 +19,11 @@ interface Upload {
 interface Login {
     name?: string,
     contract?: string,
-    data?: object,
-    update?: (state: [string, string, object]) => void
+    data?: {
+      main: any,
+      table?: string
+    },
+    update?: (state: [string, string, {main: string, table?: string}]) => void
 }
 
 interface Files { 
@@ -55,7 +58,7 @@ export const GenProvider = ({children}: {children: JSX.Element}) => {
 
     const [dirFiles, updateFiles] = useState<(dir | store)[]>([]);
 
-    const [log, updLog] = useState<[string, string, object]>(['','', {}]);
+    const [log, updLog] = useState<[string, string, {main: string, table?: string}]>(['','', {main: ''}]);
 
     return (
       <GenContext.Provider
@@ -86,7 +89,7 @@ export const GenProvider = ({children}: {children: JSX.Element}) => {
           name: log[0],
           contract: log[1],
           data: log[2],
-          update: (state: [string, string, object]) => updLog(state)
+          update: (state: [string, string, {main: string, table?: string}]) => updLog(state)
         } 
       }}
       >

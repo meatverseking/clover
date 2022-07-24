@@ -5,12 +5,12 @@ import {
   Button, Paper, InputBase, IconButton, Popper, Box, Fade
 } from "@mui/material"
 import logo from '../../public/images/logo.png';
-import user from '../../public/images/user.png';
+import userx from '../../public/images/user.png';
 import Image from 'next/image'
 
 import empty from "../../public/images/empty.png";
 
-import { FaRegFolderOpen, FaPlus, FaFolder, FaTrash, FaRegClock } from 'react-icons/fa';
+import { FaRegFolderOpen, FaPlus, FaTrash, FaRegClock } from 'react-icons/fa';
 import { MdMenuOpen, MdMenu } from "react-icons/md";
 import { BsChatText, BsChatTextFill, BsCloudy, BsGrid3X3Gap, BsList, BsPeople, BsPinAngle } from "react-icons/bs";
 import { TbSearch } from 'react-icons/tb';
@@ -39,12 +39,22 @@ import Loader from '../../app/components/loader';
 
 
 const Dashboard = () => {
-  const { Moralis } = useMoralis();
+  const { Moralis, user, isAuthenticated,  } = useMoralis();
 
   const [currentDir, setCurrentDir] = useState<string[]>(["main"]);
 
   /* upload */
   const uploadData = useContext(GenContext);
+
+  const loginData = uploadData.login;
+
+
+  useEffect(() => { 
+  if(loginData.name === undefined || loginData.name == ''){
+      window.location.href = '../';
+  }  
+
+}, [loginData.name])
 
   const dirContent = uploadData.files?.fileList !== undefined ? uploadData.files?.fileList : [];
 
@@ -59,21 +69,23 @@ const Dashboard = () => {
   };
 
   const [fileData, setFileData] = useState({});
+  const [notInit, setNotInit] = useState<boolean>(false)
   const [isLoading, setLoader] = useState(true);
-
+   const main = loginData.data === undefined ? undefined : loginData.data.main;
   useEffect(() => {
 
     async function init() {
-
       if (userTable === undefined) {
-        await beginStorageProvider();
+        await beginStorageProvider(user?.get('ethAddress') == main ? loginData.name : undefined);
       }
 
+    if(user?.get('ethAddress') == main){
+      const mainNm = loginData.name !== undefined ? loginData.name : ""; 
       const init: any = await createUserTables();
-
       const xc: any = await readDFiles(tableName);
       const dir: any = await retrieveFiles(currentDir);
       if (init.create == true && xc !== false) {
+          
         setFileData(xc);
         if (uploadData.files?.update !== undefined) {
           uploadData.files?.update(dir);
@@ -81,9 +93,16 @@ const Dashboard = () => {
         setLoader(false);
       } else if(xc == false && init.create != true){
         
+        if (user?.get("ethAddress") == main) {
+          const initTableLX = Moralis.Object.extend("DAOs");
+          const initDataTable = new initTableLX();
+          initDataTable.set("tablename", tableName);
+          await initDataTable.save();
+        }
+
         verifyHash(init.create).then(async (c) => {
-          if (c === true) {
-            await initDataStorage("Joel George"); //replace Joel George with user name
+          if (c === true) { 
+            await initDataStorage(mainNm); //replace Joel George with user name
             setFileData(initData);
             if (uploadData.files?.update !== undefined) {
               uploadData.files?.update(dir)
@@ -92,17 +111,35 @@ const Dashboard = () => {
           }
         });
       }else{
-         await initDataStorage("Joel George"); //replace Joel George with user name
+         await initDataStorage(mainNm); //replace Joel George with user name
             setFileData(initData);
             if (uploadData.files?.update !== undefined) {
               uploadData.files?.update(dir)
             }
             setLoader(false);
       }
+    }else{
+      setLoader(false);
+        if (loginData.data?.table !== undefined) {
+            setNotInit(false);
+            const xc: any = await readDFiles(loginData.data?.table);
+            const dir: any = await retrieveFiles(
+              currentDir,
+              loginData.data?.table
+            );
+            setFileData(xc);
+            if (uploadData.files?.update !== undefined) {
+              uploadData.files?.update(dir);
+            }
+
+        }else{ 
+            setNotInit(true);
+        }
+    }
     };
     init();
 
-  }, [currentDir, uploadData.files])
+  }, [main,currentDir,user, uploadData.files, Moralis.Object, loginData.data, loginData.name])
 
 
 
@@ -247,7 +284,9 @@ const Dashboard = () => {
 
       {isLoading && <Loader />}
 
-      {!isLoading && (
+      {(!isLoading && notInit) && <Loader text={"Waiting for DAO to be initialized by creator"} />}
+
+      {(!isLoading && !notInit) && (
         <div
           onDragOver={(event) => {
             dragHere(event);
@@ -261,18 +300,20 @@ const Dashboard = () => {
             <BsChatTextFill size={30} />
           </button>
 
-          <button
-            onClick={() => {
-              const elem = document?.querySelector(
-                ".input_upload"
-              ) as HTMLElement;
+          {user?.get("ethAddress") == main && (
+            <button
+              onClick={() => {
+                const elem = document?.querySelector(
+                  ".input_upload"
+                ) as HTMLElement;
 
-              elem?.click();
-            }}
-            className="py-2 mr-4 hidden st:flex fixed right-0 bottom-[10px] justify-center z-[90] items-center px-4 bg-[#1890FF] text-white w-[60px] h-[60px] rounded-[50%] overflow-hidden transition-all delay-500 hover:bg-[#0c75d6] font-[300]"
-          >
-            <FaPlus size={30} />
-          </button>
+                elem?.click();
+              }}
+              className="py-2 mr-4 hidden st:flex fixed right-0 bottom-[10px] justify-center z-[90] items-center px-4 bg-[#1890FF] text-white w-[60px] h-[60px] rounded-[50%] overflow-hidden transition-all delay-500 hover:bg-[#0c75d6] font-[300]"
+            >
+              <FaPlus size={30} />
+            </button>
+          )}
 
           <div
             style={{
@@ -443,21 +484,23 @@ const Dashboard = () => {
                     }}
                   />
 
-                  <button
-                    onClick={() => {
-                      const elem = document?.querySelector(
-                        ".input_upload"
-                      ) as HTMLElement;
+                  {(user?.get("ethAddress") == main) && (
+                    <button
+                      onClick={() => {
+                        const elem = document?.querySelector(
+                          ".input_upload"
+                        ) as HTMLElement;
 
-                      elem?.click();
-                    }}
-                    className="py-2 mr-4 st:!hidden flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[120px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]"
-                  >
-                    <FaPlus size={20} className="min-w-[20px]" />{" "}
-                    <span className="mr-4">Upload</span>
-                  </button>
+                        elem?.click();
+                      }}
+                      className="py-2 mr-4 st:!hidden flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[120px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]"
+                    >
+                      <FaPlus size={20} className="min-w-[20px]" />{" "}
+                      <span className="mr-4">Upload</span>
+                    </button>
+                  )}
 
-                  <button className="py-4 mr-4 st:!hidden flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] hover:w-[148px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]">
+                  <button className="py-4 mr-4 st:!hidden flex flex-row-reverse items-center px-4 bg-[#1890FF] text-white w-[52px] flex-nowrap rounded-md text-[16px] overflow-hidden max-h-[40px] transition-all delay-500 hover:bg-[#0c75d6] font-[300]">
                     <BsChatText size={20} className="min-w-[20px]" />
                   </button>
 
@@ -466,7 +509,7 @@ const Dashboard = () => {
                     onClick={handleClick}
                     className="border-[2px] overflow-hidden border-solid border-[#1890FF] h-[50px] w-[50px] cursor-pointer rounded-[50%]"
                   >
-                    <Image src={user} width={47} height={47} alt="user" />
+                    <Image src={userx} width={47} height={47} alt="user" />
                   </div>
 
                   <Popper id={id} open={open} anchorEl={anchorEl} transition>
