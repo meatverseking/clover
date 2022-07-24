@@ -45,18 +45,16 @@ const Dashboard = () => {
 
   /* upload */
   const uploadData = useContext(GenContext);
-
+  const [loginData, setLoginData] = useState<any[]>([]);
   useEffect(() => {
   if (localStorage.getItem("log") === null) {
     window.location.href = "../";
-  }  
+  } else {
+      const data:any = localStorage.getItem("log");
+      setLoginData(JSON.parse(data));
+  } 
 
-}, [])
-
-    let loginData: any = localStorage.getItem("log");
-    if (loginData !== null) {
-      loginData = JSON.parse(loginData);
-    }
+},[])
 
 
   const dirContent = uploadData.files?.fileList !== undefined ? uploadData.files?.fileList : [];
@@ -81,15 +79,17 @@ const Dashboard = () => {
       if (userTable === undefined) {
         await beginStorageProvider(user?.get('ethAddress') == main ? loginData[0] : undefined);
       }
-
+    
     if(user?.get('ethAddress') == main){
-      const mainNm = loginData[0] !== undefined ? loginData[0] : ""; 
+      console.log('here')
+      const mainNm = loginData[0]; 
       const init: any = await createUserTables();
       const xc: any = await readDFiles(tableName);
       const dir: any = await retrieveFiles(currentDir);
       if (init.create == true && xc !== false) {
-          
+
         setFileData(xc);
+
         if (uploadData.files?.update !== undefined) {
           uploadData.files?.update(dir);
         }
@@ -140,7 +140,9 @@ const Dashboard = () => {
         }
     }
     };
+    if(loginData.length){
     init();
+    }
 
   }, [main,currentDir,user, uploadData.files, Moralis.Object, loginData])
 
