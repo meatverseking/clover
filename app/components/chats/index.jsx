@@ -68,24 +68,22 @@ function Chats() {
               <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
             </svg>
           </div>
-          {/* <Image alt="" className="user-profile account-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png" width={30} /> */}
+
         </div>
       </div>
       <div className="wrapper">
         <div className="chat-area">
           <div className="chat-area-header">
-            <div className="chat-area-title">CodePen Group</div>
+            <div className="chat-area-title">Group Names</div>
             <div className="chat-area-group">
-              {/* <Image alt="" className="chat-area-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%283%29+%281%29.png" />
-              <Image alt="" className="chat-area-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%282%29.png" />
-              <Image alt="" className="chat-area-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%2812%29.png" /> */}
+             
               <span>+4</span>
             </div>
           </div>
           <div className="chat-area-main">
             <div className="chat-msg">
               <div className="chat-msg-profile">
-                {/* <Image alt="" className="chat-msg-img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%283%29+%281%29.png" /> */}
+              
                 <div className="chat-msg-date">Message seen 1.22pm</div>
               </div>
               <div className="chat-msg-content">
@@ -193,8 +191,8 @@ function Chats() {
                 <path d="M2 15.5l10-7 10 7M12 2v6.5" />
               </svg>
             </div>
-            <div className="detail-title">CodePen Group</div>
-            <div className="detail-subtitle">Created by Aysenur, 1 May 2020</div>
+            <div className="detail-title">Group Name</div>
+            <div className="detail-subtitle">Created by DAO</div>
             <div className="detail-buttons">
               <button className="detail-button">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" stroke="currentColor" strokeWidth="0" strokeLinecap="round" strokeLinejoin="round" className="feather feather-phone">
