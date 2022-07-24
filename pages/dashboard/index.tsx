@@ -46,15 +46,18 @@ const Dashboard = () => {
   /* upload */
   const uploadData = useContext(GenContext);
 
-  const loginData = uploadData.login;
-
-
-  useEffect(() => { 
-  if(loginData.name === undefined || loginData.name == ''){
-      window.location.href = '../';
+  useEffect(() => {
+  if (localStorage.getItem("log") === null) {
+    window.location.href = "../";
   }  
 
-}, [loginData.name])
+}, [])
+
+    let loginData: any = localStorage.getItem("log");
+    if (loginData !== null) {
+      loginData = JSON.parse(loginData);
+    }
+
 
   const dirContent = uploadData.files?.fileList !== undefined ? uploadData.files?.fileList : [];
 
@@ -71,16 +74,16 @@ const Dashboard = () => {
   const [fileData, setFileData] = useState({});
   const [notInit, setNotInit] = useState<boolean>(false)
   const [isLoading, setLoader] = useState(true);
-   const main = loginData.data === undefined ? undefined : loginData.data.main;
+   const main = loginData[2] === undefined ? undefined : loginData[2].main;
   useEffect(() => {
 
     async function init() {
       if (userTable === undefined) {
-        await beginStorageProvider(user?.get('ethAddress') == main ? loginData.name : undefined);
+        await beginStorageProvider(user?.get('ethAddress') == main ? loginData[0] : undefined);
       }
 
     if(user?.get('ethAddress') == main){
-      const mainNm = loginData.name !== undefined ? loginData.name : ""; 
+      const mainNm = loginData[0] !== undefined ? loginData[0] : ""; 
       const init: any = await createUserTables();
       const xc: any = await readDFiles(tableName);
       const dir: any = await retrieveFiles(currentDir);
@@ -120,12 +123,12 @@ const Dashboard = () => {
       }
     }else{
       setLoader(false);
-        if (loginData.data?.table !== undefined) {
+        if (loginData[2]?.table !== undefined) {
             setNotInit(false);
-            const xc: any = await readDFiles(loginData.data?.table);
+            const xc: any = await readDFiles(loginData[2]?.table);
             const dir: any = await retrieveFiles(
               currentDir,
-              loginData.data?.table
+              loginData[2]?.table
             );
             setFileData(xc);
             if (uploadData.files?.update !== undefined) {
@@ -139,7 +142,7 @@ const Dashboard = () => {
     };
     init();
 
-  }, [main,currentDir,user, uploadData.files, Moralis.Object, loginData.data, loginData.name])
+  }, [main,currentDir,user, uploadData.files, Moralis.Object, loginData])
 
 
 

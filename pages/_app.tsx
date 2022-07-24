@@ -3,7 +3,7 @@ import '../styles/index.css'
 import type { AppProps } from 'next/app'
 import { MoralisProvider } from 'react-moralis'
 import { GenProvider } from '../app/components/extras/contexts/genContext'
-
+import { LogProvider } from "../app/components/extras/contexts/logContext";
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <MoralisProvider
@@ -11,7 +11,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       serverUrl={process.env.NEXT_PUBLIC_MORALIS_SERVER || ""}
     >
       <GenProvider>
-        <Component {...pageProps} />
+        <LogProvider>
+          <Component {...pageProps} />
+        </LogProvider>
       </GenProvider>
     </MoralisProvider>
   );

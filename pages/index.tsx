@@ -15,7 +15,7 @@ import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 
 import contract from "../artifacts/contracts/share.sol/simpleNFT.json";
 import { makeNFTClient } from '../app/components/extras/storage/utoken';
-import { GenContext } from '../app/components/extras/contexts/genContext';
+import { LogContext } from '../app/components/extras/contexts/logContext';
 const contractAddress:string = "0xf4744da5fc8fb62689b23beac572633aed1280a3";
 const abi:any = contract.abi;
 
@@ -41,13 +41,8 @@ const Home: NextPage = () => {
   const [isLoading, setLoading] = useState<boolean>(false);
   const handleClose = () => setOpen(false);
   const [failMessage, setFailMessage] = useState<string>('');
-  const userData = useContext(GenContext);
+  const loginData = useContext(LogContext);
 
-
-
-  const { login: loginData } = userData;
-
-  
 
   const [userAddress, setUserAddress] = useState<string>('');
   
@@ -271,24 +266,22 @@ const Home: NextPage = () => {
       
             }
 
-            if (loginData.update !== undefined) {
-              
-              loginData.update([
-                name,
-                contractAddress,
-                { main: userAddress },
-              ]);
+              localStorage.setItem(
+                "log",
+                JSON.stringify([name, contractAddress, { main: userAddress }])
+              );
 
-              console.log(loginData, 'here')
-            }
           }else{
-            if(loginData.update !== undefined){
-            loginData.update([name, contractAd, { main: userAddress}]);
-            console.log(loginData, "hexre");
-          }
+            // loginData.update([name, contractAd, { main: userAddress}]);
+            localStorage.setItem(
+              "log",
+              JSON.stringify([name, contractAd, { main: userAddress }])
+            );
+            // console.log(loginData, "hexre");
+          
         }
 
-        // window.location.href = '/dashboard';
+        window.location.href = '/dashboard';
 
         } catch (err) {
             setLoading(false);
@@ -400,21 +393,21 @@ const Home: NextPage = () => {
                   setShowModal(true);
                   }else{
                     const vv:any = exec[0];
-                     if (loginData.update !== undefined) {
+
                       const name: string = vv.name;
                       const contract:string = vv.contract;
                       const data: { main: string; table?: string } = {
                         main: vv.main,
                         table: vv.table !== undefined ? vv.table : undefined,
                       };
-                       loginData.update([
-                         name,
-                         contract,
-                         data
-                       ]);
-
+                      
+                      localStorage.setItem(
+                "log",
+                JSON.stringify([name, contract, data])
+              );
+                      
                        window.location.href = "/dashboard";
-                     }
+                     
                   }
 
                 } else {
@@ -482,8 +475,9 @@ const Home: NextPage = () => {
                       <button
                         key={i}
                         onClick={() => {
-                          if (loginData?.update !== undefined) {
-                            loginData?.update([
+                          localStorage.setItem(
+                            "log",
+                            JSON.stringify([
                               vv.name,
                               vv.contract,
                               {
@@ -491,9 +485,10 @@ const Home: NextPage = () => {
                                 table:
                                   vv.table === undefined ? undefined : vv.table,
                               },
-                            ]);
+                            ])
+                          );
                             window.location.href = "/dashboard";
-                          }
+                          
                         }}
                         style={{ fontFamily: "inherit" }}
                         className="transition-all rounded-md delay-500 hover:border-[#1891fe] hover:text-[#1891fe] items-start text-[16px] flex justify-between border-[1px] 4sm:mr-2 text-[#575757] mb-2 w-full py-4 px-4"
